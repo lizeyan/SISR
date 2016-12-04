@@ -9,9 +9,9 @@ from Network import *
 
 train_data, test_data, train_label, test_label = load_data()
 model = Network()
-model.add(Convolution('conv1', 7, 1, 4, 0.01))
+model.add(Convolution('conv1', 7, 3, 8, 0.01))
 model.add(ReLU('relu1'))
-model.add(Convolution('conv2', 5, 4, 16, 0.01))
+model.add(Convolution('conv2', 5, 8, 16, 0.01))
 model.add(ReLU('relu2'))
 
 loss = MSELoss('MSELoss')

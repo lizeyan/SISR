@@ -5,12 +5,13 @@ import tensorflow as tf
 
 
 def data_iterator(x, y, batch_size, shuffle=True):
-    index = list(range(len(x)))
+    length = len(x)
+    index = list(range(length))
     if shuffle:
         np.random.shuffle(index)
 
-    for start_idx in range(0, len(x), batch_size):
-        end_idx = min(start_idx + batch_size, len(x))
+    for start_idx in range(0, length, batch_size):
+        end_idx = min(start_idx + batch_size, length)
         yield x[start_idx:end_idx], y[start_idx:end_idx]
 
 
