@@ -1,6 +1,11 @@
 import numpy as np
 
 
+'''
+这个文件负责处理所有的SRCNN问题数据的准备,结果的处理等琐碎的工作
+'''
+
+
 def load_data(width=28, height=28, factor=2, size=10):
     '''
     :param width: LR图片的宽度
