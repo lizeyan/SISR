@@ -8,6 +8,9 @@ def load_data(width=28, height=28, factor=2, size=10):
     :param factor: 从LR到HR的放大倍数,长和宽分别放大.
     :param size: 加载的图片数量
     :return: 图片的列表 train_data, test_data, train_label, test_label
+    train_data和test_data的尺寸为[size,width, height, channel]
+    train_label和test_label的尺寸为[size, width*factor, height*factor, channel]
+    train和test数据不能有重叠
     '''
     hr_width = width * factor
     hr_height = height * factor

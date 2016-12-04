@@ -19,6 +19,6 @@ optimizer = tf.train.AdamOptimizer(1e-4)
 input_placeholder = tf.placeholder(tf.float32)
 label_placeholder = tf.placeholder(tf.float32)
 model.compile(input_placeholder, label_placeholder, loss, optimizer)
-solve_net(model, train_data, train_label, test_data, test_label, 32, 100, 1000, 1000)
+solve_net(model, train_data, train_label, test_data, test_label, batch_size=32, max_epoch=100, disp_freq=100, test_freq=1000)
 
 
