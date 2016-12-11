@@ -16,7 +16,7 @@ def load_data(width=28, height=28, factor=2, size=1000):
     :param size: 加载的图片数量
     :return: 图片的列表 train_data, test_data, train_label, test_label
     这些列表的类型应当为numpy ndarray
-    train_data和test_data的尺寸为[size,width*factor, height*factor, channel]
+    train_data和test_data的尺寸为[size,width, height, channel]
     train_label和test_label的尺寸为[size, width*factor, height*factor, channel]
     train和test数据不能有重叠
     '''
@@ -54,8 +54,8 @@ def walk_and_load_image(directory, hr_size, lr_size):
         log("Travelling Directory: %s" % os.path.abspath(dirName))
         for file in fileList:
             with Image.open(os.path.join(dirName, file)) as img:
-                lr = (np.asarray(img.resize(lr_size).resize(hr_size)))
                 hr = (np.asarray(img.resize(hr_size)))
+                lr = (np.asarray(img.resize(lr_size)))
                 if len(lr.shape) != 3 or lr.shape[2] != 3:
                     continue
                 else:
