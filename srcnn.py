@@ -42,7 +42,7 @@ def walk_and_load_image(directory, length, hr_size, lr_size):
     for dirName, subdirList, fileList in os.walk(directory):
         log("Travelling Directory: %s" % os.path.abspath(dirName))
         for file in fileList:
-            if not file.endswith(('jpg', 'JPEG', 'png', 'JPG')):
+            if not file.endswith(('jpg', 'JPEG', 'png', 'JPG', 'bmp')):
                 continue
             with Image.open(os.path.join(dirName, file)) as img:
                 for sub_img in crop(img, hr_size[0], hr_size[1]):
