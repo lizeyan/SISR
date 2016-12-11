@@ -17,27 +17,36 @@ class Test(object):
         res = []
         for i in range(len(self.test_data)):
             hr_image = Image.fromarray(self.test_label[i])
-            lr = Image.fromarray(self.test_data[i])
-            hr_pdt = lr.resize((1024, 1024), Image.BICUBIC)
+            lr_image = Image.fromarray(self.test_data[i])
+            hr_pdt = lr_image.resize((1024, 1024), Image.BICUBIC)
             res.append(evaluation_PSNR(np.asarray(hr_pdt), np.asarray(hr_image)))
+            lr_image.save("./test_results/%d_input.jpg" % (i+1))
+            hr_image.save("./test_results/%d_label.jpg" % (i+1))
+            hr_pdt.save("./test_results/%d_bicubic.jpg" % (i+1))
         return np.mean(res)
 
     def test_bilinear(self):
         res = []
         for i in range(len(self.test_data)):
             hr_image = Image.fromarray(self.test_label[i])
-            lr = Image.fromarray(self.test_data[i])
-            hr_pdt = lr.resize((1024, 1024), Image.BILINEAR)
+            lr_image = Image.fromarray(self.test_data[i])
+            hr_pdt = lr_image.resize((1024, 1024), Image.BILINEAR)
             res.append(evaluation_PSNR(np.asarray(hr_pdt), np.asarray(hr_image)))
+            lr_image.save("./test_results/%d_input.jpg" % (i+1))
+            hr_image.save("./test_results/%d_label.jpg" % (i+1))
+            hr_pdt.save("./test_results/%d_bilinear.jpg" % (i+1))
         return np.mean(res)
 
     def test_antialias(self):
         res = []
         for i in range(len(self.test_data)):
             hr_image = Image.fromarray(self.test_label[i])
-            lr = Image.fromarray(self.test_data[i])
-            hr_pdt = lr.resize((1024, 1024), Image.ANTIALIAS)
+            lr_image = Image.fromarray(self.test_data[i])
+            hr_pdt = lr_image.resize((1024, 1024), Image.ANTIALIAS)
             res.append(evaluation_PSNR(np.asarray(hr_pdt), np.asarray(hr_image)))
+            lr_image.save("./test_results/%d_input.jpg" % (i+1))
+            hr_image.save("./test_results/%d_label.jpg" % (i+1))
+            hr_pdt.save("./test_results/%d_antialias.jpg" % (i+1))
         return np.mean(res)
 
 test = Test()
