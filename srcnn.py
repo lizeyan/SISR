@@ -26,9 +26,11 @@ def load_data(width=28, height=28, factor=2, size=1000):
     read_label = []
     dir_list = ["./data/A"]
     for directory in dir_list:
-        data, label = walk_and_load_image(directory, (hr_width, hr_height), (width, height))
+        data, label = walk_and_load_image(directory, (hr_width, hr_height), (width, height), length=size)
         read_data.extend(data)
         read_label.extend(label)
+        if len(read_data) >= size:
+            break
 
     size = int(min(size, len(read_data) / 2))
     train_data = read_data[0:size]
@@ -42,7 +44,7 @@ def load_data(width=28, height=28, factor=2, size=1000):
     return [train_data, test_data, train_label, test_label]
 
 
-def walk_and_load_image(directory, hr_size, lr_size):
+def walk_and_load_image(directory, hr_size, lr_size, length):
     '''
     遍历目录并且得到所有的JPEG图片文件
     :param directory: 要遍历的目录
@@ -54,15 +56,29 @@ def walk_and_load_image(directory, hr_size, lr_size):
         log("Travelling Directory: %s" % os.path.abspath(dirName))
         for file in fileList:
             with Image.open(os.path.join(dirName, file)) as img:
-                hr = (np.asarray(img.resize(hr_size)))
-                lr = (np.asarray(img.resize(lr_size)))
-                if len(lr.shape) != 3 or lr.shape[2] != 3:
-                    continue
-                else:
-                    data_list.append(lr)
-                    label_list.append(hr)
+                for sub_img in crop(img, hr_size[0], hr_size[1]):
+                    hr = (np.asarray(sub_img))
+                    lr = (np.asarray(sub_img.resize(lr_size)))
+                    if len(lr.shape) != 3 or lr.shape[2] != 3:
+                        continue
+                    else:
+                        data_list.append(lr)
+                        label_list.append(hr)
         log("Travelled Directory: %s" % os.path.abspath(dirName))
+        if len(data_list) >= length:
+            break
     return data_list, label_list
+
+
+def crop(image, width, height):
+    img_width, img_height = image.size
+    sub_images = []
+    for i in range(0, img_width, width):
+        for j in range(0, img_height, height):
+            box = (i, j, i + width, j + height)
+            sub_images.append(image.crop(box))
+    return sub_images
+
 
 
 

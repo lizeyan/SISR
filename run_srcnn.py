@@ -6,7 +6,7 @@ from Loss.MSELoss import MSELoss
 from srcnn import *
 from Network import *
 
-lr_size = (28, 28)
+lr_size = (56, 56)
 factor = 2
 hr_size = lr_size * factor
 train_data, test_data, train_label, test_label = load_data(width=lr_size[0], height=lr_size[1], factor=factor)
@@ -24,6 +24,6 @@ input_placeholder = tf.placeholder(tf.float32)
 label_placeholder = tf.placeholder(tf.float32)
 model.compile(input_placeholder, label_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
-          batch_size=128, max_epoch=10000, disp_freq=100, test_freq=1000)
+          batch_size=32, max_epoch=10000, disp_freq=100, test_freq=1000)
 
 
