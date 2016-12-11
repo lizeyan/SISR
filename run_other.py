@@ -11,14 +11,14 @@ class Test(object):
         self.test_label = []
 
     def load_test_data(self):
-        self.test_data, self.test_label = load_data(["./data/test"], 512, 512, factor=self.factor, size=10)
+        self.test_data, self.test_label = load_data(["./data/test"], 32, 32, factor=self.factor, size=10)
 
     def test_bicubic(self):
         res = []
         for i in range(len(self.test_data)):
             hr_image = Image.fromarray(self.test_label[i])
             lr_image = Image.fromarray(self.test_data[i])
-            hr_pdt = lr_image.resize((1024, 1024), Image.BICUBIC)
+            hr_pdt = lr_image.resize((64, 64), Image.BICUBIC)
             res.append(evaluation_PSNR(np.asarray(hr_pdt), np.asarray(hr_image)))
             lr_image.save("./test_results/%d_input.jpg" % (i+1))
             hr_image.save("./test_results/%d_label.jpg" % (i+1))
@@ -30,7 +30,7 @@ class Test(object):
         for i in range(len(self.test_data)):
             hr_image = Image.fromarray(self.test_label[i])
             lr_image = Image.fromarray(self.test_data[i])
-            hr_pdt = lr_image.resize((1024, 1024), Image.BILINEAR)
+            hr_pdt = lr_image.resize((64, 64), Image.BILINEAR)
             res.append(evaluation_PSNR(np.asarray(hr_pdt), np.asarray(hr_image)))
             lr_image.save("./test_results/%d_input.jpg" % (i+1))
             hr_image.save("./test_results/%d_label.jpg" % (i+1))
@@ -42,7 +42,7 @@ class Test(object):
         for i in range(len(self.test_data)):
             hr_image = Image.fromarray(self.test_label[i])
             lr_image = Image.fromarray(self.test_data[i])
-            hr_pdt = lr_image.resize((1024, 1024), Image.ANTIALIAS)
+            hr_pdt = lr_image.resize((64, 64), Image.ANTIALIAS)
             res.append(evaluation_PSNR(np.asarray(hr_pdt), np.asarray(hr_image)))
             lr_image.save("./test_results/%d_input.jpg" % (i+1))
             hr_image.save("./test_results/%d_label.jpg" % (i+1))
