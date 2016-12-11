@@ -13,6 +13,8 @@ model.add(Convolution('conv1', 7, 3, 8, 0.01))
 model.add(ReLU('relu1'))
 model.add(Convolution('conv2', 5, 8, 16, 0.01))
 model.add(ReLU('relu2'))
+model.add(Convolution('conv3', 3, 16, 3, 0.01))
+model.add(ReLU('relu3'))
 
 loss = MSELoss('MSELoss')
 optimizer = tf.train.AdamOptimizer(1e-4)

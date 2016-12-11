@@ -27,9 +27,13 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
             if iter_counter % disp_freq == 0:
                 train_PSNR = model.evaluation_PSNR.eval(feed_dict={model.input_placeholder: x, model.label_placeholder: y})
                 log('Iter:%d, train PSNR: %f' % (iter_counter, train_PSNR))
+            if iter_counter % test_freq == 0:
+                log("Testing......")
+                test_PSNR = model.evaluation_PSNR.eval(feed_dict={model.input_placeholder: test_x, model.label_placeholder: test_y})
+                log("Iter:%d, test PSNR: %f" % (iter_counter, test_PSNR))
 
     test_PSNR = model.evaluation_PSNR.eval(feed_dict={model.input_placeholder: test_x, model.label_placeholder: test_y})
     log("Final Test PSNR: %f" % test_PSNR)
     toc = time.time()
-    log("Total train time: %d" % (toc - tic))
+    log("Total train time: %dseconds" % (toc - tic))
 
