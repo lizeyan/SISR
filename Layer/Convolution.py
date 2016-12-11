@@ -13,4 +13,4 @@ class Convolution(Layer):
                                     initial_value=tf.zeros(shape=[num_output]))
 
     def forward(self, inputs):
-        return tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding='SAME') + self.bias
+        return tf.nn.bias_add(tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding='SAME'), self.bias)

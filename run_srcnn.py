@@ -16,7 +16,7 @@ model.add(ReLU('relu2'))
 model.add(Convolution('conv3', 5, 32, 3, 0.01))
 
 loss = MSELoss('MSELoss')
-optimizer = tf.train.AdamOptimizer(1e-4)
+optimizer = tf.train.AdamOptimizer(0.01)
 input_placeholder = tf.placeholder(tf.float32)
 label_placeholder = tf.placeholder(tf.float32)
 model.compile(input_placeholder, label_placeholder, loss, optimizer)

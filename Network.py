@@ -23,6 +23,6 @@ class Network(object):
         self.label_placeholder = label_placeholder
         self.loss = loss.forward(x, label_placeholder)
         self.train_step = optimizer.minimize(self.loss)
-        self.evaluation_PSNR = 10 * tf.log(1 / tf.reduce_mean(tf.squared_difference(tf.image.resize_images(x, tf.shape(label_placeholder)[1:3]), label_placeholder)))
+        self.evaluation_PSNR = 10 * tf.log(255**2 / tf.reduce_mean(tf.squared_difference(tf.image.resize_images(x, tf.shape(label_placeholder)[1:3]), label_placeholder)))
         log("Compile finished")
 
