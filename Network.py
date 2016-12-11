@@ -10,6 +10,7 @@ class Network(object):
         self.evaluation_PSNR = None
         self.input_placeholder = None
         self.label_placeholder = None
+        self.sr = None
 
     def add(self, layer):
         self.layer_list.append(layer)
@@ -19,10 +20,10 @@ class Network(object):
         x = input_placeholder
         for layer in self.layer_list:
             x = layer.forward(x)
+        self.sr = x
         self.input_placeholder = input_placeholder
         self.label_placeholder = label_placeholder
-        self.loss = loss.forward(x, label_placeholder)
+        self.loss = loss.forward(self.sr, label_placeholder)
         self.train_step = optimizer.minimize(self.loss)
-        self.evaluation_PSNR = 10 * tf.log(255**2 / tf.reduce_mean(tf.squared_difference(tf.image.resize_images(x, tf.shape(label_placeholder)[1:3]), label_placeholder)))
         log("Compile finished")
 
