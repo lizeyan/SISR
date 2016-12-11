@@ -65,6 +65,8 @@ def crop(image, width, height):
     for i in range(0, img_width, width):
         for j in range(0, img_height, height):
             box = (i, j, i + width, j + height)
+            if i + width >= img_width or j + height >= img_height:
+                continue
             sub_images.append(image.crop(box))
     return sub_images
 
