@@ -14,7 +14,7 @@ model = Network()
 model.add(Resize('resize', factor))
 model.add(Convolution('conv1', 9, 3, 32, 0.01))
 model.add(ReLU('relu1'))
-model.add(Convolution('conv2', 1, 32, 16, 0.01))
+model.add(Convolution('conv2', 3, 32, 16, 0.01))
 model.add(ReLU('relu2'))
 model.add(Convolution('conv3', 5, 16, 3, 0.01))
 
