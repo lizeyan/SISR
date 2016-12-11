@@ -8,7 +8,7 @@ import numpy as np
 '''
 
 
-def load_data(width=28, height=28, factor=2, size=1000):
+def load_data(dir_list, width=28, height=28, factor=2, size=1000):
     '''
     :param width: LR图片的宽度
     :param height: LR图片的高度
@@ -24,43 +24,32 @@ def load_data(width=28, height=28, factor=2, size=1000):
     hr_height = height * factor
     read_data = []
     read_label = []
-    dir_list = ["./data/A"]
-    for directory in dir_list:
-        data, label = walk_and_load_image(directory, (hr_width, hr_height), (width, height), length=size)
+    for d in dir_list:
+        data, label = walk_and_load_image(d, hr_size=(hr_width, hr_height), lr_size=(width, height), length=size)
         read_data.extend(data)
         read_label.extend(label)
         if len(read_data) >= size:
             break
-
-    size = int(min(size, len(read_data) / 2))
-    train_data = read_data[0:size]
-    test_data = read_data[size:size + size]
-    train_label = read_label[0:size]
-    test_label = read_label[size:size + size]
-    # convert type, and read_data become a tensor implicitly
-    # resize the images
-    # after the process we need to convert it to list
-
-    return [train_data, test_data, train_label, test_label]
+    return read_data[0:size], read_label[0:size]
 
 
-def walk_and_load_image(directory, hr_size, lr_size, length):
+def walk_and_load_image(directory, length, hr_size, lr_size):
     '''
     遍历目录并且得到所有的JPEG图片文件
-    :param directory: 要遍历的目录
-    :return: 得到的数据集列表
     '''
     data_list = []
     label_list = []
     for dirName, subdirList, fileList in os.walk(directory):
         log("Travelling Directory: %s" % os.path.abspath(dirName))
         for file in fileList:
+            if not file.endswith(('jpg', 'JPEG', 'png', 'JPG')):
+                continue
             with Image.open(os.path.join(dirName, file)) as img:
                 for sub_img in crop(img, hr_size[0], hr_size[1]):
                     hr = (np.asarray(sub_img))
                     lr = (np.asarray(sub_img.resize(lr_size)))
                     if len(lr.shape) != 3 or lr.shape[2] != 3:
-                        continue
+                       continue
                     else:
                         data_list.append(lr)
                         label_list.append(hr)

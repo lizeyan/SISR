@@ -31,26 +31,28 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
                 log('Iter:%d, train PSNR: %f' % (iter_counter, psnr))
             if iter_counter % test_freq == 0:
                 log("Testing......")
-                test_PSNR = test(model, test_x, test_y, batch_size)
+                test_PSNR = test(model, test_x, test_y)
                 log("Iter:%d, test PSNR: %f" % (iter_counter, test_PSNR))
 
     toc = time.time()
     log("Total train time: %dseconds" % (toc - tic))
 
 
-def test(model, test_x, test_y, batch_size, save_output=True):
+def test(model, test_x, test_y, save_output=True):
     test_PSNR = []
-    for x, y in data_iterator(test_x, test_y, batch_size, shuffle=False):
+    counter = 0
+    for x, y in data_iterator(test_x, test_y, 1, shuffle=False):
         sr = model.sr.eval(feed_dict={model.input_placeholder: x, model.label_placeholder: y})
         test_PSNR.append(evaluation_PSNR(sr, y))
         if save_output:
             for i in range(len(x)):
+                counter += 1
                 lr_img = Image.fromarray(x[i])
                 hr_img = Image.fromarray(y[i])
                 hr_pdt = Image.fromarray(np.asarray(sr[i]).astype(np.uint8))
-                lr_img.save("./test_results/%d_input.jpg" % i)
-                hr_img.save("./test_results/%d_label.jpg" % i)
-                hr_pdt.save("./test_results/%d_predict.jpg" % i)
+                lr_img.save("./test_results/%d_input.jpg" % counter)
+                hr_img.save("./test_results/%d_label.jpg" % counter)
+                hr_pdt.save("./test_results/%d_predict.jpg" % counter)
     return np.mean(test_PSNR)
 
 
