@@ -25,6 +25,7 @@ input_placeholder = tf.placeholder(tf.float32)
 label_placeholder = tf.placeholder(tf.float32)
 model.compile(input_placeholder, label_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
-          batch_size=32, max_epoch=10000, disp_freq=100, test_freq=1000)
+          batch_size=32, max_epoch=10000, disp_freq=100, test_freq=1000,
+          save_path="./model/model1.ckpt", load_path=None)
 
 

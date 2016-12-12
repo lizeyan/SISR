@@ -16,9 +16,15 @@ def data_iterator(x, y, batch_size, shuffle=True):
         yield x[start_idx:end_idx], y[start_idx:end_idx]
 
 
-def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, disp_freq, test_freq):
+def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, disp_freq, test_freq,
+              save_path="./model/model.ckpt", load_path=None):
+    saver = tf.train.Saver()
     sess = tf.InteractiveSession()
-    sess.run(tf.global_variables_initializer())
+    if load_path is None:
+        sess.run(tf.global_variables_initializer())
+    else:
+        sess.run(saver.restore(sess, load_path))
+        log("Load model from %s" % load_path)
     tic = time.time()
     iter_counter = 0
     for k in range(max_epoch):
@@ -33,6 +39,8 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
                 log("Testing......")
                 test_PSNR = test(model, test_x, test_y)
                 log("Iter:%d, test PSNR: %f" % (iter_counter, test_PSNR))
+                saved = saver.save(sess, save_path=save_path)
+                log("Model saved in %s" % saved)
 
     toc = time.time()
     log("Total train time: %dseconds" % (toc - tic))
@@ -43,7 +51,8 @@ def test(model, test_x, test_y, save_output=True):
     counter = 0
     for x, y in data_iterator(test_x, test_y, 1, shuffle=False):
         sr = model.sr.eval(feed_dict={model.input_placeholder: x, model.label_placeholder: y})
-        test_PSNR.append(evaluation_PSNR(sr, y))
+        psnr = evaluation_PSNR(sr, y)
+        test_PSNR.append(psnr)
         if save_output:
             for i in range(len(x)):
                 counter += 1
@@ -52,7 +61,7 @@ def test(model, test_x, test_y, save_output=True):
                 hr_pdt = Image.fromarray(np.asarray(sr[i]).astype(np.uint8))
                 lr_img.save("./test_results/%d_input.jpg" % counter)
                 hr_img.save("./test_results/%d_label.jpg" % counter)
-                hr_pdt.save("./test_results/%d_predict.jpg" % counter)
+                hr_pdt.save("./test_results/%d_predict_%f.jpg" % (counter, psnr))
     return np.mean(test_PSNR)
 
 
