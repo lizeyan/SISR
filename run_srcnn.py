@@ -9,8 +9,8 @@ from Network import *
 lr_size = (32, 32)
 factor = 2
 hr_size = lr_size * factor
-train_data, train_label = load_data(["./data/A/"], lr_size[0], lr_size[1], factor=factor, size=100000)
-test_data, test_label = load_data(["./data/test"], 512, 512, factor=factor, size=10)
+train_data, train_label = load_data(["./data/Train/"], lr_size[0], lr_size[1], factor=factor, size=100000)
+test_data, test_label = load_data(["./data/Test"], factor=factor, size=19)
 model = Network()
 model.add(Resize('resize', factor))
 model.add(Convolution('conv1', 9, 3, 32, 0.001))

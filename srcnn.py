@@ -8,24 +8,31 @@ import numpy as np
 '''
 
 
-def load_data(dir_list, width=28, height=28, factor=2, size=1000):
+def load_data(dir_list, width=None, height=None, factor=2, size=1000):
     '''
+    :param dir_list: 要遍历的目录列表
     :param width: LR图片的宽度
     :param height: LR图片的高度
     :param factor: 从LR到HR的放大倍数,长和宽分别放大.
     :param size: 加载的图片数量
-    :return: 图片的列表 train_data, test_data, train_label, test_label
+    :return: 图片的列表 data, label
     这些列表的类型应当为numpy ndarray
-    train_data和test_data的尺寸为[size,width, height, channel]
-    train_label和test_label的尺寸为[size, width*factor, height*factor, channel]
-    train和test数据不能有重叠
     '''
-    hr_width = width * factor
-    hr_height = height * factor
+    if width is not None:
+        hr_width = width * factor
+    else:
+        hr_width = None
+    if height is not None:
+        hr_height = height * factor
+    else:
+        hr_height = None
     read_data = []
     read_label = []
     for d in dir_list:
-        data, label = walk_and_load_image(d, hr_size=(hr_width, hr_height), lr_size=(width, height), length=size)
+        if width is not None and height is not None:
+            data, label = walk_and_load_image(d, hr_size=(hr_width, hr_height), lr_size=(width, height), length=size)
+        else:
+            data, label = walk_and_load_image(d, hr_size=None, lr_size=None, factor=factor, length=size)
         read_data.extend(data)
         read_label.extend(label)
         if len(read_data) >= size:
@@ -33,9 +40,9 @@ def load_data(dir_list, width=28, height=28, factor=2, size=1000):
     return read_data[0:size], read_label[0:size]
 
 
-def walk_and_load_image(directory, length, hr_size, lr_size):
+def walk_and_load_image(directory, length, hr_size, lr_size, factor=None):
     '''
-    遍历目录并且得到所有的JPEG图片文件
+    遍历目录并且得到所有的图片文件
     '''
     data_list = []
     label_list = []
@@ -45,14 +52,27 @@ def walk_and_load_image(directory, length, hr_size, lr_size):
             if not file.endswith(('jpg', 'JPEG', 'png', 'JPG', 'bmp')):
                 continue
             with Image.open(os.path.join(dirName, file)) as img:
-                for sub_img in crop(img, hr_size[0], hr_size[1]):
-                    hr = (np.asarray(sub_img))
-                    lr = (np.asarray(sub_img.resize(lr_size)))
-                    if len(lr.shape) != 3 or lr.shape[2] != 3:
-                       continue
-                    else:
+                if hr_size is None or lr_size is None:
+                    lrs = tuple((int(item / factor) for item in img.size))
+                    hrs = tuple((item * factor for item in lrs))
+                    lr = (np.asarray(img.resize(lrs)))
+                    hr = (np.asarray(img.resize(hrs)))
+                    if len(lr.shape) == 3 and lr.shape[2] == 3:
                         data_list.append(lr)
                         label_list.append(hr)
+                    # elif len(lr.shape) == 2:
+                    #     data_list.append(lr[:, :, None])
+                    #     label_list.append(hr[:, :, None])
+                else:
+                    for sub_img in crop(img, hr_size[0], hr_size[1]):
+                        hr = (np.asarray(sub_img))
+                        lr = (np.asarray(sub_img.resize(lr_size)))
+                        if len(lr.shape) == 3 and lr.shape[2] == 3:
+                            data_list.append(lr)
+                            label_list.append(hr)
+                        # elif len(lr.shape) == 2:
+                        #     data_list.append(lr[:, :, None])
+                        #     label_list.append(hr[:, :, None])
         log("Travelled Directory: %s" % os.path.abspath(dirName))
         if len(data_list) >= length:
             break
