@@ -35,9 +35,13 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000):
             data, label = walk_and_load_image(d, hr_size=None, lr_size=None, factor=factor, length=size)
         read_data.extend(data)
         read_label.extend(label)
+        '''
         if len(read_data) >= size:
             break
+
     return read_data[0:size], read_label[0:size]
+    '''
+    return read_data, read_label
 
 
 def walk_and_load_image(directory, length, hr_size, lr_size, factor=None):
@@ -74,8 +78,8 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None):
                         #     data_list.append(lr[:, :, None])
                         #     label_list.append(hr[:, :, None])
         log("Travelled Directory: %s" % os.path.abspath(dirName))
-        if len(data_list) >= length:
-            break
+        '''if len(data_list) >= length:
+            break'''
     return data_list, label_list
 
 
