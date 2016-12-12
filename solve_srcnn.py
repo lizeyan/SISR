@@ -23,7 +23,7 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
     if load_path is None:
         sess.run(tf.global_variables_initializer())
     else:
-        sess.run(saver.restore(sess, load_path))
+        saver.restore(sess, load_path)
         log("Load model from %s" % load_path)
     tic = time.time()
     iter_counter = 0
