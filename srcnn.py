@@ -8,7 +8,7 @@ import numpy as np
 '''
 
 
-def load_data(dir_list, width=None, height=None, factor=2, size=1000):
+def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1):
     '''
     :param dir_list: 要遍历的目录列表
     :param width: LR图片的宽度
@@ -30,9 +30,9 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000):
     read_label = []
     for d in dir_list:
         if width is not None and height is not None:
-            data, label = walk_and_load_image(d, hr_size=(hr_width, hr_height), lr_size=(width, height), length=size)
+            data, label = walk_and_load_image(d, hr_size=(hr_width, hr_height), lr_size=(width, height), length=size, channel=channel)
         else:
-            data, label = walk_and_load_image(d, hr_size=None, lr_size=None, factor=factor, length=size)
+            data, label = walk_and_load_image(d, hr_size=None, lr_size=None, factor=factor, length=size, channel=channel)
         read_data.extend(data)
         read_label.extend(label)
         '''
@@ -44,7 +44,7 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000):
     return read_data, read_label
 
 
-def walk_and_load_image(directory, length, hr_size, lr_size, factor=None):
+def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channel=1):
     '''
     遍历目录并且得到所有的图片文件
     '''
@@ -59,11 +59,12 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None):
                 if hr_size is None or lr_size is None:
                     lrs = tuple((int(item / factor) for item in img.size))
                     hrs = tuple((item * factor for item in lrs))
-                    lr = (np.asarray(img.resize(lrs)))
-                    hr = (np.asarray(img.resize(hrs)))
-                    if len(lr.shape) == 3 and lr.shape[2] == 3:
-                        data_list.append(lr)
-                        label_list.append(hr)
+                    lr = np.asarray(img.resize(lrs))
+                    hr = np.asarray(img.resize(hrs))
+                    if len(lr.shape) == 3:
+                        for left in range(0, lr.shape[2] - channel + 1, channel):
+                            data_list.append(lr[:, :, left:left + channel])
+                            label_list.append(hr[:, :, left:left + channel])
                     # elif len(lr.shape) == 2:
                     #     data_list.append(lr[:, :, None])
                     #     label_list.append(hr[:, :, None])
@@ -71,15 +72,16 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None):
                     for sub_img in crop(img, hr_size[0], hr_size[1]):
                         hr = (np.asarray(sub_img))
                         lr = (np.asarray(sub_img.resize(lr_size)))
-                        if len(lr.shape) == 3 and lr.shape[2] == 3:
-                            data_list.append(lr)
-                            label_list.append(hr)
+                        if len(lr.shape) == 3:
+                            for left in range(0, lr.shape[2] - channel + 1, channel):
+                                data_list.append(lr[:, :, left:left + channel])
+                                label_list.append(hr[:, :, left:left + channel])
                         # elif len(lr.shape) == 2:
                         #     data_list.append(lr[:, :, None])
                         #     label_list.append(hr[:, :, None])
         log("Travelled Directory: %s" % os.path.abspath(dirName))
-        '''if len(data_list) >= length:
-            break'''
+        if len(data_list) >= length:
+            break
     return data_list, label_list
 
 
