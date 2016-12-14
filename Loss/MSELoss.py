@@ -3,10 +3,12 @@ import tensorflow as tf
 
 
 class MSELoss(Loss):
-    def __init__(self, name):
+    def __init__(self, name, target_height, target_width):
         super(MSELoss, self).__init__(name)
+        self.target_height = target_height
+        self.target_width = target_width
 
-    @staticmethod
-    def forward(x, y):
+    def forward(self, x, y):
+        y = tf.slice(y, begin=tf.to_int32(tf.divide(tf.shape(y) - tf.shape(x), tf.constant(2))), size=tf.shape(x))
         return tf.reduce_mean(tf.squared_difference(x, y))
 
