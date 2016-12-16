@@ -17,7 +17,8 @@ def data_iterator(x, y, batch_size, shuffle=True):
         yield x[start_idx:end_idx], y[start_idx:end_idx]
 
 
-def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, disp_freq, test_freq, save_res_freq,
+def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, disp_freq, test_freq,
+              save_res_freq, keep_prob=0.5,
               save_path="./model/model/", load_path=None):
     saver = tf.train.Saver()
     sess = tf.InteractiveSession()
@@ -33,9 +34,13 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
     for k in range(max_epoch):
         for x, y in data_iterator(train_x, train_y, batch_size):
             iter_counter += 1
-            model.train_step.run(feed_dict={model.input_placeholder: x, model.label_placeholder: y})
+            model.train_step.run(feed_dict={model.input_placeholder: x,
+                                            model.label_placeholder: y,
+                                            model.keep_prob_placeholder: keep_prob})
             if disp_freq is not None and iter_counter % disp_freq == 0:
-                sr = model.sr.eval(feed_dict={model.input_placeholder: x, model.label_placeholder: y})
+                sr = model.sr.eval(feed_dict={model.input_placeholder: x,
+                                              model.label_placeholder: y,
+                                              model.keep_prob_placeholder: keep_prob})
                 psnr = evaluation_PSNR(sr, y)
                 log('Iter:%d, train PSNR: %f' % (iter_counter, psnr))
             if test_freq is not None and iter_counter % test_freq == 0:
@@ -54,7 +59,9 @@ def test(model, test_x, test_y, save_output=True):
     counter = 0
     channel = test_x[0].shape[2]
     for x, y in data_iterator(test_x, test_y, 1, shuffle=False):
-        sr = model.sr.eval(feed_dict={model.input_placeholder: x, model.label_placeholder: y})
+        sr = model.sr.eval(feed_dict={model.input_placeholder: x,
+                                      model.label_placeholder: y,
+                                      model.keep_prob_placeholder: 1.0})
         psnr = evaluation_PSNR(sr, y)
         test_PSNR.append(psnr)
         if save_output:

@@ -10,12 +10,13 @@ class Network(object):
         self.evaluation_PSNR = None
         self.input_placeholder = None
         self.label_placeholder = None
+        self.keep_prob_placeholder = None
         self.sr = None
 
     def add(self, layer):
         self.layer_list.append(layer)
 
-    def compile(self, input_placeholder, label_placeholder, loss, optimizer):
+    def compile(self, input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer):
         log("Start Compiling")
         x = input_placeholder
         for layer in self.layer_list:
@@ -23,6 +24,7 @@ class Network(object):
         self.sr = x
         self.input_placeholder = input_placeholder
         self.label_placeholder = label_placeholder
+        self.keep_prob_placeholder = keep_prob_placeholder
         self.loss = loss.forward(self.sr, label_placeholder)
         self.train_step = optimizer.minimize(self.loss)
         log("Compile finished")
