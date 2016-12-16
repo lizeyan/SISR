@@ -35,13 +35,13 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1)
             data, label = walk_and_load_image(d, hr_size=None, lr_size=None, factor=factor, length=size, channel=channel)
         read_data.extend(data)
         read_label.extend(label)
-        '''
+
         if len(read_data) >= size:
             break
 
     return read_data[0:size], read_label[0:size]
     '''
-    return read_data, read_label
+    return read_data, read_label'''
 
 
 def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channel=1):
