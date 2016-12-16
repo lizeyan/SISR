@@ -1,8 +1,12 @@
 from srcnn import load_data
 from PIL import Image
-from solve_srcnn import evaluation_PSNR
 import numpy as np
 from utils import log
+
+def evaluation_PSNR(data, label):
+    mse = np.mean((data - label) ** 2)
+    return 20 * np.log10(255) - 10 * np.log10(mse)
+
 
 class Test(object):
     def __init__(self):
@@ -11,7 +15,7 @@ class Test(object):
         self.test_label = []
 
     def load_test_data(self):
-        self.test_data, self.test_label = load_data(["./data/Test"], factor=self.factor, size=19)
+        self.test_data, self.test_label = load_data(["./data/Test/"], factor=self.factor, channel=3, size=19)
 
     def test_bicubic(self):
         res = []
