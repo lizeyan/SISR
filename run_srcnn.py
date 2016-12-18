@@ -12,8 +12,12 @@ factor = 2
 channel = 3
 filter_size = (9, 5, 5)
 hr_size = lr_size * factor
-train_data, train_label = load_data(["./data/Train/"], lr_size[0], lr_size[1], factor=factor, size=10000, channel=channel, filter_size=filter_size)
+train_data, train_label = load_data(["./data/Train/"], lr_size[0], lr_size[1], factor=factor, size=1000, channel=channel, filter_size=filter_size)
 test_data, test_label = load_data(["./data/Test/Set5"], factor=factor, size=19, channel=channel, filter_size=filter_size)
+print(train_data[0].shape)
+print(train_label[0].shape)
+print(test_data[0].shape)
+print(test_label[0].shape)
 print("The real size of train data set is: %d" % len(train_data))
 print("The real size of test data set is: %d" % len(test_data))
 input_placeholder = tf.placeholder(tf.float32)
@@ -27,7 +31,6 @@ model.add(Convolution('conv2', filter_size[1], 64, 32, 0.001))
 model.add(ReLU('relu2'))
 model.add(Convolution('conv3', filter_size[2], 32, channel, 0.001))
 
-#loss = MSELoss('MSELoss', hr_size[0] - sum(filter_size) + len(filter_size), hr_size[0] - sum(filter_size) + len(filter_size))
 loss = MSELoss('MSELoss')
 optimizer = tf.train.AdamOptimizer(0.0001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)

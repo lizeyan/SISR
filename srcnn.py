@@ -40,11 +40,6 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1,
         if len(read_data) >= size:
             break
 
-    return read_data[0:size], read_label[0:size]
-    for data in read_data:
-        data = data / 255;
-    for label in read_label:
-        label = label / 255;
     return read_data, read_label
 
 
@@ -67,8 +62,8 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
                     hr = np.asarray(img.resize(hrs))
                     if len(lr.shape) == 3:
                         for left in range(0, lr.shape[2] - channel + 1, channel):
-                            data_list.append(lr[:, :, left:left + channel])
-                            label_list.append(hr[:, :, left:left + channel])
+                            data_list.append(lr[:, :, left:left + channel] / 255)
+                            label_list.append(hr[:, :, left:left + channel] / 255)
                     # elif len(lr.shape) == 2:
                     #     data_list.append(lr[:, :, None])
                     #     label_list.append(hr[:, :, None])
@@ -78,8 +73,8 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
                         lr = (np.asarray(sub_img.resize(lr_size)))
                         if len(lr.shape) == 3:
                             for left in range(0, lr.shape[2] - channel + 1, channel):
-                                data_list.append(lr[:, :, left:left + channel])
-                                label_list.append(hr[:, :, left:left + channel])
+                                data_list.append(lr[:, :, left:left + channel] / 255)
+                                label_list.append(hr[:, :, left:left + channel] / 255)
                         # elif len(lr.shape) == 2:
                         #     data_list.append(lr[:, :, None])
                         #     label_list.append(hr[:, :, None])
