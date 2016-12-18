@@ -25,10 +25,15 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     if load_path is None:
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.initialize_all_variables())
     else:
-        saver.restore(sess, load_path)
-        log("Load model from %s" % load_path)
+        ckpt = tf.train.get_checkpoint_state(load_path)
+        if ckpt and ckpt.model_checkpoint_path:
+            saver.restore(sess, ckpt.model_checkpoint_path)
+            log("Load model from %s" % load_path)
+        else:
+            log("Warning: No checkpoitn found in %s" % load_path)
+            sess.run(tf.initialize_all_variables())
     tic = time.time()
     iter_counter = 0
     for k in range(max_epoch):
@@ -47,7 +52,7 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
                 log("Testing......")
                 test_PSNR = test(model, test_x, test_y, iter_counter % save_res_freq == 0)
                 log("Iter:%d, test PSNR: %f" % (iter_counter, test_PSNR))
-                saved = saver.save(sess, save_path=save_path)
+                saved = saver.save(sess, save_path=save_path, global_step=iter_counter + 1)
                 log("Model saved in %s" % saved)
 
     toc = time.time()

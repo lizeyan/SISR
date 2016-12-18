@@ -9,6 +9,6 @@ class MSELoss(Loss):
         self.target_width = target_width
 
     def forward(self, x, y):
-        y = tf.slice(y, begin=tf.to_int32(tf.divide(tf.shape(y) - tf.shape(x), tf.constant(2))), size=tf.shape(x))
+        y = tf.slice(y, begin=tf.to_int32(tf.div(tf.shape(y) - tf.shape(x), tf.constant(2))), size=tf.shape(x))
         return tf.reduce_mean(tf.squared_difference(x, y))
 

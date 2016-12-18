@@ -41,6 +41,10 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1)
 
     return read_data[0:size], read_label[0:size]
     '''
+    for data in read_data:
+        data = data / 255;
+    for label in read_label:
+        label = label / 255;
     return read_data, read_label
 
 
@@ -85,11 +89,13 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
     return data_list, label_list
 
 
-def crop(image, width, height):
+def crop(image, width, height, stride=None):
+    if stride is None:
+        stride = width
     img_width, img_height = image.size
     sub_images = []
-    for i in range(0, img_width, width):
-        for j in range(0, img_height, height):
+    for i in range(0, img_width, stride):
+        for j in range(0, img_height, stride):
             box = (i, j, i + width, j + height)
             if i + width >= img_width or j + height >= img_height:
                 continue
