@@ -8,13 +8,14 @@ import numpy as np
 '''
 
 
-def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1, filter_size=()):
+def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1):
     '''
     :param dir_list: 要遍历的目录列表
     :param width: LR图片的宽度
     :param height: LR图片的高度
     :param factor: 从LR到HR的放大倍数,长和宽分别放大.
     :param size: 加载的图片数量
+    :param channel
     :return: 图片的列表 data, label
     这些列表的类型应当为numpy ndarray
     '''
@@ -28,12 +29,11 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1,
         hr_height = None
     read_data = []
     read_label = []
-    size_loss = sum(filter_size) - len(filter_size)
     for d in dir_list:
         if width is not None and height is not None:
-            data, label = walk_and_load_image(d, hr_size=(hr_width, hr_height), lr_size=(width, height), length=size, channel=channel, size_loss=size_loss)
+            data, label = walk_and_load_image(d, hr_size=(hr_width, hr_height), lr_size=(width, height), length=size, channel=channel)
         else:
-            data, label = walk_and_load_image(d, hr_size=None, lr_size=None, factor=factor, length=size, channel=channel, size_loss=size_loss)
+            data, label = walk_and_load_image(d, hr_size=None, lr_size=None, factor=factor, length=size, channel=channel)
         read_data.extend(data)
         read_label.extend(label)
 
@@ -43,7 +43,7 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1,
     return read_data, read_label
 
 
-def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channel=1, size_loss=0):
+def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channel=1):
     '''
     遍历目录并且得到所有的图片文件
     '''
@@ -57,7 +57,7 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
             with Image.open(os.path.join(dirName, file)) as img:
                 if hr_size is None or lr_size is None:
                     lrs = tuple((int(item / factor) for item in img.size))
-                    hrs = tuple((item * factor - size_loss for item in lrs))
+                    hrs = tuple((item * factor  for item in lrs))
                     lr = np.asarray(img.resize(lrs))
                     hr = np.asarray(img.resize(hrs))
                     if len(lr.shape) == 3:
@@ -68,7 +68,7 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
                     #     data_list.append(lr[:, :, None])
                     #     label_list.append(hr[:, :, None])
                 else:
-                    for sub_img in crop(img, hr_size[0] - size_loss, hr_size[1] - size_loss, stride=14):
+                    for sub_img in crop(img, hr_size[0], hr_size[1], stride=14):
                         hr = (np.asarray(sub_img))
                         lr = (np.asarray(sub_img.resize(lr_size)))
                         if len(lr.shape) == 3:
