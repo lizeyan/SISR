@@ -8,16 +8,12 @@ from srcnn import *
 from Network import *
 
 lr_size = (33, 33)
-factor = 2
+factor = 3
 channel = 3
-filter_size = (9, 5, 5)
+filter_size = (9, 1, 5)
 hr_size = lr_size * factor
-train_data, train_label = load_data(["./data/Train/"], lr_size[0], lr_size[1], factor=factor, size=1000, channel=channel, filter_size=filter_size)
+train_data, train_label = load_data(["./data/Train/Set91"], lr_size[0], lr_size[1], factor=factor, size=30000, channel=channel, filter_size=filter_size)
 test_data, test_label = load_data(["./data/Test/Set5"], factor=factor, size=19, channel=channel, filter_size=filter_size)
-print(train_data[0].shape)
-print(train_label[0].shape)
-print(test_data[0].shape)
-print(test_label[0].shape)
 print("The real size of train data set is: %d" % len(train_data))
 print("The real size of test data set is: %d" % len(test_data))
 input_placeholder = tf.placeholder(tf.float32)
@@ -35,8 +31,8 @@ loss = MSELoss('MSELoss')
 optimizer = tf.train.AdamOptimizer(0.0001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
-          batch_size=2, max_epoch=1000000, disp_freq=100, test_freq=1000,
-          save_path="./model/model_factor2_955_normalized_labelresize/", load_path="./model/model_factor2_955_normalized_labelresize/",
-          save_res_freq=10000)
+          batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
+          save_path="./model/model_factor3/", load_path="./model/model_factor3/",
+          save_res_freq=100000)
 
 

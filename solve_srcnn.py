@@ -40,12 +40,10 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
         for x, y in data_iterator(train_x, train_y, batch_size):
             iter_counter += 1
             model.train_step.run(feed_dict={model.input_placeholder: x,
-                                            model.label_placeholder: y,
-                                            model.keep_prob_placeholder: keep_prob})
+                                            model.label_placeholder: y})
             if disp_freq is not None and iter_counter % disp_freq == 0:
                 sr = model.sr.eval(feed_dict={model.input_placeholder: x,
-                                              model.label_placeholder: y,
-                                              model.keep_prob_placeholder: keep_prob})
+                                              model.label_placeholder: y})
                 psnr = evaluation_PSNR(sr, y)
                 log('Iter:%d, train PSNR: %f' % (iter_counter, psnr))
             if test_freq is not None and iter_counter % test_freq == 0:
@@ -77,9 +75,9 @@ def test(model, test_x, test_y, save_output=True):
                     hr_img = Image.fromarray(np.squeeze(y[i], axis=(2, )))
                     hr_pdt = Image.fromarray(np.squeeze(np.asarray(sr[i]).astype(np.uint8), axis=(2,)))
                 else:
-                    lr_img = Image.fromarray((x[i] * 255).astype(np.uint8))
-                    hr_img = Image.fromarray((y[i] * 255).astype(np.uint8))
-                    hr_pdt = Image.fromarray((np.asarray(sr[i]) * 255).astype(np.uint8))
+                    lr_img = Image.fromarray((x[i]).astype(np.uint8))
+                    hr_img = Image.fromarray((y[i]).astype(np.uint8))
+                    hr_pdt = Image.fromarray((np.asarray(sr[i])).astype(np.uint8))
                 lr_img.save("./test_results/%d_input.jpg" % counter)
                 hr_img.save("./test_results/%d_label.jpg" % counter)
                 hr_pdt.save("./test_results/%d_predict_%f.jpg" % (counter, psnr))
@@ -88,4 +86,4 @@ def test(model, test_x, test_y, save_output=True):
 
 def evaluation_PSNR(data, label):
     mse = np.mean(np.square(data - label))
-    return 20 * np.log10(1) - 10 * np.log10(mse)
+    return 20 * np.log10(255) - 10 * np.log10(mse)

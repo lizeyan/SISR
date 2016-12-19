@@ -62,19 +62,19 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
                     hr = np.asarray(img.resize(hrs))
                     if len(lr.shape) == 3:
                         for left in range(0, lr.shape[2] - channel + 1, channel):
-                            data_list.append(lr[:, :, left:left + channel] / 255)
-                            label_list.append(hr[:, :, left:left + channel] / 255)
+                            data_list.append(lr[:, :, left:left + channel])
+                            label_list.append(hr[:, :, left:left + channel])
                     # elif len(lr.shape) == 2:
                     #     data_list.append(lr[:, :, None])
                     #     label_list.append(hr[:, :, None])
                 else:
-                    for sub_img in crop(img, hr_size[0] - size_loss, hr_size[1] - size_loss):
+                    for sub_img in crop(img, hr_size[0] - size_loss, hr_size[1] - size_loss, stride=14):
                         hr = (np.asarray(sub_img))
                         lr = (np.asarray(sub_img.resize(lr_size)))
                         if len(lr.shape) == 3:
                             for left in range(0, lr.shape[2] - channel + 1, channel):
-                                data_list.append(lr[:, :, left:left + channel] / 255)
-                                label_list.append(hr[:, :, left:left + channel] / 255)
+                                data_list.append(lr[:, :, left:left + channel])
+                                label_list.append(hr[:, :, left:left + channel])
                         # elif len(lr.shape) == 2:
                         #     data_list.append(lr[:, :, None])
                         #     label_list.append(hr[:, :, None])
