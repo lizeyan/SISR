@@ -9,7 +9,7 @@ class MSELoss(Loss):
         # self.target_width = target_width
 
     def forward(self, x, y):
-        #y = tf.slice(y, begin=tf.to_int32(tf.div(tf.shape(y) - tf.shape(x), tf.constant(2))), size=tf.shape(x))
-        y = tf.map_fn()
+        y = tf.slice(y, begin=tf.to_int32(tf.div(tf.shape(y) - tf.shape(x), tf.constant(2))), size=tf.shape(x))
+        # y = tf.map_fn(lambda img: tf.image.resize_image_with_crop_or_pad(img, tf.shape(x)[1], tf.shape(x)[2]), y);
         return tf.reduce_mean(tf.square(x - y))
 

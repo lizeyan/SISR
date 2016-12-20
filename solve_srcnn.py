@@ -35,23 +35,23 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
             log("Warning: No checkpoitn found in %s" % load_path)
             sess.run(tf.initialize_all_variables())
     tic = time.time()
+    loss_list = []
     iter_counter = 0
     for k in range(max_epoch):
         for x, y in data_iterator(train_x, train_y, batch_size):
             iter_counter += 1
-            model.train_step.run(feed_dict={model.input_placeholder: x,
-                                            model.label_placeholder: y})
+            _, loss, sr = sess.run([model.train_step, model.loss, model.sr], feed_dict={model.input_placeholder: x, model.label_placeholder: y})
+            loss_list.append(loss)
             if disp_freq is not None and iter_counter % disp_freq == 0:
-                sr = model.sr.eval(feed_dict={model.input_placeholder: x,
-                                              model.label_placeholder: y})
                 psnr = evaluation_PSNR(sr, y)
-                log('Iter:%d, train PSNR: %f' % (iter_counter, psnr))
+                log('Iter:%d, train PSNR: %f, mean loss: %f' % (iter_counter, psnr, np.mean(loss_list)))
             if test_freq is not None and iter_counter % test_freq == 0:
                 log("Testing......")
                 test_PSNR = test(model, test_x, test_y, iter_counter % save_res_freq == 0)
                 log("Iter:%d, test PSNR: %f" % (iter_counter, test_PSNR))
                 saved = saver.save(sess, save_path=save_path, global_step=iter_counter + 1)
                 log("Model saved in %s" % saved)
+                loss_list.clear()
 
     toc = time.time()
     log("Total train time: %dseconds" % (toc - tic))
