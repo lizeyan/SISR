@@ -7,13 +7,13 @@ from Loss.MSELoss import MSELoss
 from srcnn import *
 from Network import *
 
-lr_size = (12, 12)
+lr_size = (9, 9)
 factor = 4
 channel = 3
-filter_size = (9, 1, 5)
-hr_size = lr_size * factor
-train_data, train_label = load_data(["./data/Train/Set5"], lr_size[0], lr_size[1], factor=factor, size=10, channel=channel)
-test_data, test_label = load_data(["./data/Test/Set5"], factor=factor, size=19, channel=channel)
+filter_size = (9, 3, 5)
+hr_size = tuple(item * factor for item in lr_size) 
+train_data, train_label = load_data(["./data/Train/"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel)
+test_data, test_label = load_data(["./data/Test/Set5"], factor=factor, size=5, channel=channel)
 print("The real size of train data set is: %d" % len(train_data))
 print("The real size of test data set is: %d" % len(test_data))
 input_placeholder = tf.placeholder(tf.float32)
@@ -31,7 +31,7 @@ loss = MSELoss('MSELoss')
 optimizer = tf.train.AdamOptimizer(0.0001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
-          batch_size=4, max_epoch=1000000, disp_freq=1, test_freq=1000,
+          batch_size=32, max_epoch=1000000, disp_freq=100, test_freq=5000,
           save_path="./model/model_factor4_935/", load_path="./model/model_factor4_935/",
           save_res_freq=100000)
 

@@ -7,7 +7,6 @@ import numpy as np
 这个文件负责处理所有的SRCNN问题数据的准备,结果的处理等琐碎的工作
 '''
 
-
 def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1):
     '''
     :param dir_list: 要遍历的目录列表
