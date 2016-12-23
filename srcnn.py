@@ -39,7 +39,7 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1)
         if len(read_data) >= size:
             break
 
-    return read_data, read_label
+    return np.asarray(read_data), np.asarray(read_label)
 
 
 def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channel=1):

@@ -12,20 +12,22 @@ def data_iterator(x, y, batch_size, shuffle=True):
     if shuffle:
         np.random.shuffle(index)
 
+    x = x[index]
+    y = y[index]
     for start_idx in range(0, length, batch_size):
         end_idx = min(start_idx + batch_size, length)
         yield x[start_idx:end_idx], y[start_idx:end_idx]
 
 
 def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, disp_freq, test_freq,
-              save_res_freq, keep_prob=0.5,
+              save_res_freq, keep_prob=0.5, summary_dir="./summary",
               save_path="./model/model/", load_path=None):
     saver = tf.train.Saver()
     sess = tf.InteractiveSession()
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     if load_path is None:
-        sess.run(tf.initialize_all_variables())
+        sess.run(tf.global_variables_initializer())
     else:
         ckpt = tf.train.get_checkpoint_state(load_path)
         if ckpt and ckpt.model_checkpoint_path:
@@ -34,17 +36,22 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
         else:
             log("Warning: No checkpoitn found in %s" % load_path)
             sess.run(tf.initialize_all_variables())
+    summary_writer = tf.summary.FileWriter(summary_dir, sess.graph)
     tic = time.time()
     loss_list = []
     iter_counter = 0
     for k in range(max_epoch):
         for x, y in data_iterator(train_x, train_y, batch_size):
             iter_counter += 1
-            _, loss, sr = sess.run([model.train_step, model.loss, model.sr], feed_dict={model.input_placeholder: x, model.label_placeholder: y})
+            summary, _, loss, sr = sess.run([model.merged, model.train_step, model.loss, model.sr],
+                                            feed_dict={
+                                                model.input_placeholder: x,
+                                                model.label_placeholder: y})
             loss_list.append(loss)
             if disp_freq is not None and iter_counter % disp_freq == 0:
                 psnr = evaluation_PSNR(sr, y)
                 log('Iter:%d, train PSNR: %f, mean loss: %f' % (iter_counter, psnr, np.mean(loss_list)))
+                summary_writer.add_summary(summary, iter_counter)
             if test_freq is not None and iter_counter % test_freq == 0:
                 log("Testing......")
                 test_PSNR = test(model, test_x, test_y, iter_counter % save_res_freq == 0)

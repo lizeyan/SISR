@@ -14,5 +14,6 @@ class Linear(Layer):
 
     def forward(self, inputs):
         # 将输入flatten到2维
-        dim = numpy.prod(inputs.get_shape().as_list()[1:])
-        return tf.matmul(tf.reshape(inputs, [-1, dim]), self.weight) + self.bias
+        with tf.name_scope(self.name):
+            dim = numpy.prod(inputs.get_shape().as_list()[1:])
+            return tf.matmul(tf.reshape(inputs, [-1, dim]), self.weight) + self.bias
