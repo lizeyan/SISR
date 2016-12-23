@@ -69,10 +69,10 @@ def test(model, test_x, test_y, save_output=True):
     counter = 0
     channel = test_x[0].shape[2]
     for x, y in data_iterator(test_x, test_y, 1, shuffle=False):
-        sr = model.sr.eval(feed_dict={model.input_placeholder: x,
-                                      model.label_placeholder: y,
+        sr = model.sr.eval(feed_dict={model.input_placeholder: [x[0]],
+                                      model.label_placeholder: [y[0]],
                                       model.keep_prob_placeholder: 1.0})
-        psnr = evaluation_PSNR(sr, y)
+        psnr = evaluation_PSNR(sr, [y[0]])
         test_PSNR.append(psnr)
         if save_output:
             for i in range(len(x)):
