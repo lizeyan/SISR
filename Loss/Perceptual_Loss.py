@@ -11,7 +11,6 @@ class Perceptual_Loss(Loss):
         self.vgg2 = None
 
     def forward(self, x, y):
-        y = tf.map_fn(lambda img: tf.image.resize_image_with_crop_or_pad(img, tf.shape(x)[1], tf.shape(x)[2]), y)
         self.vgg1 = vgg16(x, 'vgg16_weights.npz', self.sess)
         self.vgg2 = vgg16(y, 'vgg16_weights.npz', self.sess)
         x1 = self.vgg1.conv3_3
