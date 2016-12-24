@@ -7,4 +7,5 @@ class ReLU(Layer):
         Layer.__init__(self, name, False)
 
     def forward(self, inputs):
-        return tf.nn.relu(inputs)
+        with tf.name_scope(self.name):
+            return tf.nn.relu(inputs)

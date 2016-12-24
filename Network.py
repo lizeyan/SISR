@@ -12,6 +12,7 @@ class Network(object):
         self.label_placeholder = None
         self.keep_prob_placeholder = None
         self.sr = None
+        self.merged = None
 
     def add(self, layer):
         self.layer_list.append(layer)
@@ -26,6 +27,8 @@ class Network(object):
         self.label_placeholder = label_placeholder
         self.keep_prob_placeholder = keep_prob_placeholder
         self.loss = loss.forward(self.sr, label_placeholder)
+        tf.summary.scalar(name="loss", tensor=self.loss)
         self.train_step = optimizer.minimize(self.loss)
+        self.merged = tf.summary.merge_all()
         log("Compile finished")
 

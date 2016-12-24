@@ -8,4 +8,7 @@ class Resize(Layer):
         self.factor = factor
 
     def forward(self, inputs):
-        return tf.image.resize_bicubic(inputs, tf.shape(inputs)[1:3] * self.factor)
+        with tf.name_scope(self.name):
+            with tf.name_scope(self.name + "/get_shape"):
+                shape = tf.shape(inputs)[1:3] * self.factor
+            return tf.image.resize_bicubic(inputs, shape)

@@ -8,9 +8,15 @@ class Convolution(Layer):
         weight_shape = [kernel_size, kernel_size, inputs_dim, num_output]
         with tf.name_scope(name):
             self.weight = tf.Variable(name="weight",
-                                      initial_value=tf.random_normal(shape=weight_shape, stddev=init_std))
+                                      initial_value=tf.random_normal(shape=weight_shape, stddev=init_std),
+                                      trainable=True)
             self.bias = tf.Variable(name="bias",
-                                    initial_value=tf.zeros(shape=[num_output]))
+                                    initial_value=tf.zeros(shape=[num_output]),
+                                    trainable=True)
 
     def forward(self, inputs):
-        return tf.nn.bias_add(tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding='VALID'), self.bias)
+        with tf.name_scope(self.name):
+            return tf.nn.bias_add(tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding='SAME'),
+                                  self.bias,
+                                  data_format="NHWC")
+            # return tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding="VALID")

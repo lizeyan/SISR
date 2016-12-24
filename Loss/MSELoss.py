@@ -3,13 +3,16 @@ import tensorflow as tf
 
 
 class MSELoss(Loss):
-    def __init__(self, name):
+    def __init__(self, name, target_height, target_width):
         super(MSELoss, self).__init__(name)
-        # self.target_height = target_height
-        # self.target_width = target_width
+        self.target_height = target_height
+        self.target_width = target_width
 
     def forward(self, x, y):
-        # y = tf.slice(y, begin=tf.to_int32(tf.div(tf.shape(y) - tf.shape(x), tf.constant(2))), size=tf.shape(x))
-        y = tf.map_fn(lambda img: tf.image.resize_image_with_crop_or_pad(img, tf.shape(x)[1], tf.shape(x)[2]), y);
-        return tf.reduce_mean(tf.square(x - y))
+        with tf.name_scope(self.name):
+            # y = tf.map_fn(lambda img: tf.image.resize_image_with_crop_or_pad(img, self.target_height, self.target_width)
+            #               , y)
+
+            y = tf.image.resize_bicubic(y, [self.target_height, self.target_width])
+            return tf.reduce_mean(tf.squared_difference(x, y))
 

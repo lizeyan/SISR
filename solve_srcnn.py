@@ -12,20 +12,26 @@ def data_iterator(x, y, batch_size, shuffle=True):
     if shuffle:
         np.random.shuffle(index)
 
+    x = x[index]
+    y = y[index]
     for start_idx in range(0, length, batch_size):
         end_idx = min(start_idx + batch_size, length)
         yield x[start_idx:end_idx], y[start_idx:end_idx]
 
 
 def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, disp_freq, test_freq,
-              save_res_freq, keep_prob=0.5,
+              save_res_freq, keep_prob=0.5, summary_dir="./summary",
               save_path="./model/model/", load_path=None):
     saver = tf.train.Saver()
     sess = tf.InteractiveSession()
+    param_counter = tf.zeros([1], dtype=tf.int32)
+    for variable in tf.trainable_variables():
+        param_counter += tf.size(variable)
+    log("The number of trainable parameters: %d" % param_counter.eval())
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     if load_path is None:
-        sess.run(tf.initialize_all_variables())
+        sess.run(tf.global_variables_initializer())
     else:
         ckpt = tf.train.get_checkpoint_state(load_path)
         if ckpt and ckpt.model_checkpoint_path:
@@ -33,18 +39,23 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
             log("Load model from %s" % load_path)
         else:
             log("Warning: No checkpoitn found in %s" % load_path)
-            sess.run(tf.initialize_all_variables())
+            sess.run(tf.global_variables_initializer())
+    summary_writer = tf.summary.FileWriter(summary_dir, sess.graph)
     tic = time.time()
     loss_list = []
     iter_counter = 0
     for k in range(max_epoch):
         for x, y in data_iterator(train_x, train_y, batch_size):
             iter_counter += 1
-            _, loss, sr = sess.run([model.train_step, model.loss, model.sr], feed_dict={model.input_placeholder: x, model.label_placeholder: y})
+            summary, _, loss, sr = sess.run([model.merged, model.train_step, model.loss, model.sr],
+                                            feed_dict={
+                                                model.input_placeholder: x,
+                                                model.label_placeholder: y})
             loss_list.append(loss)
             if disp_freq is not None and iter_counter % disp_freq == 0:
                 psnr = evaluation_PSNR(sr, y)
                 log('Iter:%d, train PSNR: %f, mean loss: %f' % (iter_counter, psnr, np.mean(loss_list)))
+                summary_writer.add_summary(summary, iter_counter)
             if test_freq is not None and iter_counter % test_freq == 0:
                 log("Testing......")
                 test_PSNR = test(model, test_x, test_y, iter_counter % save_res_freq == 0)
@@ -62,10 +73,10 @@ def test(model, test_x, test_y, save_output=True):
     counter = 0
     channel = test_x[0].shape[2]
     for x, y in data_iterator(test_x, test_y, 1, shuffle=False):
-        sr = model.sr.eval(feed_dict={model.input_placeholder: x,
-                                      model.label_placeholder: y,
+        sr = model.sr.eval(feed_dict={model.input_placeholder: [x[0]],
+                                      model.label_placeholder: [y[0]],
                                       model.keep_prob_placeholder: 1.0})
-        psnr = evaluation_PSNR(sr, y)
+        psnr = evaluation_PSNR(sr, [y[0]])
         test_PSNR.append(psnr)
         if save_output:
             for i in range(len(x)):

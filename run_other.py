@@ -2,6 +2,7 @@ from srcnn import load_data
 from PIL import Image
 import numpy as np
 from utils import log
+import sys
 
 def evaluation_PSNR(data, label):
     mse = np.mean((data - label) ** 2)
@@ -9,8 +10,8 @@ def evaluation_PSNR(data, label):
 
 
 class Test(object):
-    def __init__(self):
-        self.factor = 2
+    def __init__(self, factor=2):
+        self.factor = factor
         self.test_data = []
         self.test_label = []
 
@@ -53,7 +54,10 @@ class Test(object):
             hr_pdt.save("./test_results/%d_antialias.jpg" % (i+1))
         return np.mean(res)
 
-test = Test()
+if len(sys.argv) > 1:
+    test = Test(factor=eval(sys.argv[1]))
+else:
+    test = Test()
 test.load_test_data()
 result1 = test.test_bicubic()
 result2 = test.test_bilinear()
