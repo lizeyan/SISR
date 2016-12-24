@@ -31,17 +31,17 @@ keep_prob_placeholder = tf.placeholder(tf.float32, name="keep_prob")
 model = Network()
 model.add(Resize('resize', factor))
 model.add(Convolution('Patch_extraction', filter_size[0], channel, filter_num[0], 0.0001))
-model.add(PReLU('relu1'))
+model.add(PReLU('prelu1'))
 model.add(Convolution('Mapping', filter_size[1], filter_num[0], filter_num[1], 0.0001))
-model.add(PReLU('relu2'))
+model.add(PReLU('prelu2'))
 model.add(Convolution('Reconstruction', filter_size[2], filter_num[1], channel, 0.0001))
 
-loss = MSELoss('MSELoss', hr_size[0], hr_size[1])
-optimizer = tf.train.AdamOptimizer(0.0001)
+loss = MSELoss('MSELoss', hr_size[0] - size_loss, hr_size[1] - size_loss)
+optimizer = tf.train.AdamOptimizer(0.00001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
-          save_path="./model/model_factor2_915/", load_path=None,
+          save_path="./model_srcnn/factor2_915_3/", load_path="./model_srcnn/factor2_915_3/",
           save_res_freq=100000)
 
 

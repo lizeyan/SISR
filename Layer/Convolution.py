@@ -16,7 +16,7 @@ class Convolution(Layer):
 
     def forward(self, inputs):
         with tf.name_scope(self.name):
-            return tf.nn.bias_add(tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding='SAME'),
+            return tf.nn.bias_add(tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding='VALID'),
                                   self.bias,
                                   data_format="NHWC")
             # return tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding="VALID")
