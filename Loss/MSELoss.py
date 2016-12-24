@@ -10,7 +10,9 @@ class MSELoss(Loss):
 
     def forward(self, x, y):
         with tf.name_scope(self.name):
-            y = tf.map_fn(lambda img: tf.image.resize_image_with_crop_or_pad(img, self.target_height, self.target_width)
-                          , y)
+            # y = tf.map_fn(lambda img: tf.image.resize_image_with_crop_or_pad(img, self.target_height, self.target_width)
+            #               , y)
+
+            y = tf.image.resize_bicubic(y, [self.target_height, self.target_width])
             return tf.reduce_mean(tf.squared_difference(x, y))
 

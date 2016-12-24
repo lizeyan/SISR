@@ -13,7 +13,7 @@ lr_size = (16, 16)
 factor = 2
 channel = 3
 filter_size = (5, 1, 3, 1, 9)
-filter_num = (56, 12)  # d s
+filter_num = (56, 16)  # d s
 hr_size = tuple(item * factor for item in lr_size)
 print("low resolution size: ", lr_size)
 print("high resolution size: ", hr_size)
@@ -45,12 +45,12 @@ model.add(Deconvolution(name="Deconvolution", kernel_size=filter_size[4],
                         inputs_dim=filter_num[0], num_output=channel, init_std=1e-4,
                         factor=factor))
 
-loss = MSELoss('MSELoss', 27, 27)
+loss = MSELoss('MSELoss', hr_size[0], hr_size[1])
 optimizer = tf.train.AdamOptimizer(0.00001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
-          batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
-          save_path="./model_fsrcnn/factor4_51312_3/", load_path="./model_fsrcnn/factor4_51312_3/",
+          batch_size=32, max_epoch=1000000, disp_freq=100, test_freq=1000,
+          save_path="./model_fsrcnn/factor2_51312_3/", load_path="./model_fsrcnn/factor2_51312_3/",
           save_res_freq=100000)
 
 

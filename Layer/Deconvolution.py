@@ -21,10 +21,10 @@ class Deconvolution(Layer):
         with tf.name_scope(self.name):
             conv = tf.nn.conv2d_transpose(inputs, self.weight,
                                           output_shape=[tf.shape(inputs)[0],
-                                                        self.factor * (tf.shape(inputs)[1] - 1) + self.kernel_size,
-                                                        self.factor * (tf.shape(inputs)[2] - 1) + self.kernel_size,
+                                                        self.factor * (tf.shape(inputs)[1]),
+                                                        self.factor * (tf.shape(inputs)[2]),
                                                         self.num_output],
                                           strides=[1, self.factor, self.factor, 1],
-                                          padding="VALID", data_format="NHWC")
+                                          padding="SAME", data_format="NHWC")
             return conv
             # return tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding="VALID")
