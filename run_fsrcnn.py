@@ -1,6 +1,7 @@
 from Layer.ReLU import ReLU
 from Layer.PReLU import PReLU
 from Layer.Convolution import Convolution
+from Layer.Deconvolution import Deconvolution
 from Layer.Resize import Resize
 from Layer.Dropout import Dropout
 from solve_srcnn import *
@@ -11,9 +12,8 @@ from Network import *
 lr_size = (16, 16)
 factor = 2
 channel = 3
-filter_size = (9, 1, 5)
-filter_num = (64, 32)
-size_loss = sum(filter_size) - len(filter_size)
+filter_size = (5, 1, 3, 1, 2)
+filter_num = (56, 12)  # d s
 hr_size = tuple(item * factor for item in lr_size)
 print("low resolution size: ", lr_size)
 print("high resolution size: ", hr_size)
@@ -29,19 +29,28 @@ label_placeholder = tf.placeholder(tf.float32, name="input_label")
 keep_prob_placeholder = tf.placeholder(tf.float32, name="keep_prob")
 
 model = Network()
-model.add(Resize('resize', factor))
-model.add(Convolution('Patch_extraction', filter_size[0], channel, filter_num[0], 0.0001))
-model.add(PReLU('relu1'))
-model.add(Convolution('Mapping', filter_size[1], filter_num[0], filter_num[1], 0.0001))
-model.add(PReLU('relu2'))
-model.add(Convolution('Reconstruction', filter_size[2], filter_num[1], channel, 0.0001))
+model.add(Convolution(name="Feature_extraction", kernel_size=filter_size[0],
+                      inputs_dim=channel, num_output=filter_num[0], init_std=1e-4))
+model.add(PReLU('prelu1'))
+model.add(Convolution(name="Shrinking", kernel_size=filter_size[1],
+                      inputs_dim=filter_num[0], num_output=filter_num[1], init_std=1e-4))
+model.add(PReLU('prelu2'))
+model.add(Convolution(name="Mapping", kernel_size=filter_size[2],
+                      inputs_dim=filter_num[1], num_output=filter_num[1], init_std=1e-4))
+model.add(PReLU('prelu3'))
+model.add(Convolution(name="Expanding", kernel_size=filter_size[3],
+                      inputs_dim=filter_num[1], num_output=filter_num[0], init_std=1e-4))
+model.add(PReLU('prelu4'))
+model.add(Deconvolution(name="Deconvolution", kernel_size=filter_size[4],
+                        inputs_dim=filter_num[0], num_output=channel, init_std=1e-4,
+                        factor=factor))
 
-loss = MSELoss('MSELoss', hr_size[0], hr_size[1])
-optimizer = tf.train.AdamOptimizer(0.0001)
+loss = MSELoss('MSELoss', factor * (lr_size[0] - 1) + filter_size[4], factor * (lr_size[1] - 1) + filter_size[4])
+optimizer = tf.train.AdamOptimizer(0.001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
-          save_path="./model/model_factor2_915/", load_path=None,
+          save_path="./model_fsrcnn/model_factor2/", load_path="./model_fsrcnn/model_factor2/",
           save_res_freq=100000)
 
 

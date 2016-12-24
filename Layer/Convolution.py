@@ -10,13 +10,13 @@ class Convolution(Layer):
             self.weight = tf.Variable(name="weight",
                                       initial_value=tf.random_normal(shape=weight_shape, stddev=init_std),
                                       trainable=True)
-            # self.bias = tf.Variable(name="bias",
-            #                         initial_value=tf.zeros(shape=[num_output]),
-            #                         trainable=True)
+            self.bias = tf.Variable(name="bias",
+                                    initial_value=tf.zeros(shape=[num_output]),
+                                    trainable=True)
 
     def forward(self, inputs):
         with tf.name_scope(self.name):
-            # return tf.nn.bias_add(tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding='VALID'),
-            #                       self.bias,
-            #                       data_format="NHWC")
-            return tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding="VALID")
+            return tf.nn.bias_add(tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding='SAME'),
+                                  self.bias,
+                                  data_format="NHWC")
+            # return tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding="VALID")
