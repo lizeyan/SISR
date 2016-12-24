@@ -35,11 +35,11 @@ model.add(ReLU('relu2'))
 model.add(Convolution('conv3', filter_size[2], 32, channel, 0.0001))
 
 loss = MSELoss('MSELoss', hr_size[0] - size_loss, hr_size[1] - size_loss)
-optimizer = tf.train.AdamOptimizer(0.0001)
+optimizer = tf.train.AdamOptimizer(0.000001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
-          batch_size=32, max_epoch=1000000, disp_freq=10, test_freq=10,
-          save_path="./model/model_factor4_935/", load_path=None,
+          batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
+          save_path="./model/model_factor4_935/", load_path="./model/model_factor4_935/",
           save_res_freq=100000)
 
 

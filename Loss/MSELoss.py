@@ -21,7 +21,7 @@ class MSELoss(Loss):
             # tf.summary.scalar("size_2", shape[2])
             # tf.summary.scalar("size_3", shape[3])
             # y = tf.slice(y, begin=begin, size=shape)
-            # y = tf.map_fn(lambda img: tf.image.resize_bicubic(img, tf.shape(x)[1], tf.shape(x)[2]), y)
-            y = tf.image.resize_bicubic(y, size=[self.target_height, self.target_width])
+            y = tf.map_fn(lambda img: tf.image.resize_image_with_crop_or_pad(img, self.target_height, self.target_width), y)
+            # y = tf.image.resize_bicubic(y, size=[self.target_height, self.target_width])
             return tf.reduce_mean(tf.squared_difference(x, y))
 
