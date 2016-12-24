@@ -8,9 +8,11 @@ class Linear(Layer):
         super(Linear, self).__init__(name, True)
         with tf.name_scope(name):
             self.weight = tf.Variable(name="weight",
-                                      initial_value=tf.random_normal(shape=[inputs_dim, num_output], stddev=init_std))
+                                      initial_value=tf.random_normal(shape=[inputs_dim, num_output], stddev=init_std),
+                                      trainable=True)
             self.bias = tf.Variable(name="bias",
-                                    initial_value=tf.zeros(shape=[num_output]))
+                                    initial_value=tf.zeros(shape=[num_output]),
+                                    trainable=True)
 
     def forward(self, inputs):
         # 将输入flatten到2维

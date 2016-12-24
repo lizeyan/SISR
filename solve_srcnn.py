@@ -24,6 +24,10 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
               save_path="./model/model/", load_path=None):
     saver = tf.train.Saver()
     sess = tf.InteractiveSession()
+    param_counter = tf.zeros([1], dtype=tf.int32)
+    for variable in tf.trainable_variables():
+        param_counter += tf.size(variable)
+    log("The number of trainable parameters: %d" % param_counter.eval())
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     if load_path is None:
@@ -35,7 +39,7 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
             log("Load model from %s" % load_path)
         else:
             log("Warning: No checkpoitn found in %s" % load_path)
-            sess.run(tf.initialize_all_variables())
+            sess.run(tf.global_variables_initializer())
     summary_writer = tf.summary.FileWriter(summary_dir, sess.graph)
     tic = time.time()
     loss_list = []
