@@ -16,7 +16,7 @@ class Test(object):
         self.test_label = []
 
     def load_test_data(self):
-        self.test_data, self.test_label = load_data(["./data/Test/"], factor=self.factor, channel=3, size=1000000)
+        self.test_data, self.test_label = load_data(["./data/Test/Set5"], factor=self.factor, channel=3, size=1000000)
 
     def test_bicubic(self):
         res = []

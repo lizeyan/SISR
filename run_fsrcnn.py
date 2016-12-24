@@ -49,8 +49,9 @@ loss = MSELoss('MSELoss', hr_size[0], hr_size[1])
 optimizer = tf.train.AdamOptimizer(0.00001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
-          batch_size=32, max_epoch=1000000, disp_freq=100, test_freq=1000,
-          save_path="./model_fsrcnn/factor2_51312_3/", load_path="./model_fsrcnn/factor2_51312_3/",
+          batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
+          save_path="./model_fsrcnn/factor2_51319_3/", load_path="./model_fsrcnn/factor2_51319_3/",
+          #save_path="./model_fsrcnn/factor2_test/", load_path=None,
           save_res_freq=100000)
 
 
