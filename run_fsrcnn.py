@@ -9,7 +9,7 @@ from Loss.MSELoss import MSELoss
 from srcnn import *
 from Network import *
 
-lr_size = (16, 16)
+lr_size = (64, 64)
 factor = 2
 channel = 3
 filter_size = (5, 1, 3, 1, 9)
@@ -20,7 +20,7 @@ print("high resolution size: ", hr_size)
 train_data, train_label = load_data(["./data/Train/Set91"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel)
 print("train data shape", np.shape(train_data))
 print("train label shape", np.shape(train_label))
-test_data, test_label = load_data(["./data/Test/Set5"], factor=factor, size=19, channel=channel)
+test_data, test_label = load_data(["./data/Test/Set5"], 128, 128, factor=factor, size=500, channel=channel)
 print("The real size of train data set is: %d" % len(train_data))
 print("The real size of test data set is: %d" % len(test_data))
 
@@ -53,6 +53,6 @@ solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
           save_path="./model_fsrcnn/factor2_51319_3/", load_path="./model_fsrcnn/factor2_51319_3/",
           # save_path="./model_fsrcnn/factor2_test/", load_path=None,
-          save_res_freq=1000)
+          save_res_freq=50000)
 
 

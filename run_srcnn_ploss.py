@@ -37,7 +37,6 @@ model.add(Convolution('Mapping', filter_size[1], filter_num[0], filter_num[1], 0
 model.add(PReLU('prelu2'))
 model.add(Convolution('Reconstruction', filter_size[2], filter_num[1], channel, 0.0001))
 
-loss = MSELoss('MSELoss', hr_size[0], hr_size[1])
 loss1 = Perceptual_Loss('Perceptual_Loss')
 optimizer = tf.train.AdamOptimizer(0.00001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss1, optimizer)
