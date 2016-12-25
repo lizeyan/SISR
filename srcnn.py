@@ -7,7 +7,7 @@ import numpy as np
 这个文件负责处理所有的SRCNN问题数据的准备,结果的处理等琐碎的工作
 '''
 
-def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1):
+def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1, resize=False):
     '''
     :param dir_list: 要遍历的目录列表
     :param width: LR图片的宽度
@@ -30,9 +30,17 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1)
     read_label = []
     for d in dir_list:
         if width is not None and height is not None:
-            data, label = walk_and_load_image(d, hr_size=(hr_width, hr_height), lr_size=(width, height), length=size, channel=channel)
+            data, label = walk_and_load_image(d,
+                                              hr_size=(hr_width, hr_height),
+                                              lr_size=(width, height),
+                                              length=size,
+                                              channel=channel,
+                                              resize=resize)
         else:
-            data, label = walk_and_load_image(d, hr_size=None, lr_size=None, factor=factor, length=size, channel=channel)
+            data, label = walk_and_load_image(d, hr_size=None,
+                                              lr_size=None, factor=factor,
+                                              length=size, channel=channel,
+                                              resize=False)
         read_data.extend(data)
         read_label.extend(label)
 
@@ -42,7 +50,7 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1)
     return np.asarray(read_data), np.asarray(read_label)
 
 
-def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channel=1):
+def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channel=1, resize=False):
     '''
     遍历目录并且得到所有的图片文件
     '''
@@ -66,6 +74,11 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
                     # elif len(lr.shape) == 2:
                     #     data_list.append(lr[:, :, None])
                     #     label_list.append(hr[:, :, None])
+                elif resize:
+                    hr = np.asarray(img.resize(hr_size))
+                    lr = np.asarray(img.resize(lr_size))
+                    data_list.append(lr)
+                    label_list.append(hr)
                 else:
                     for sub_img in crop(img, hr_size[0], hr_size[1], stride=14):
                         hr = (np.asarray(sub_img))
