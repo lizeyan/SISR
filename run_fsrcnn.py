@@ -1,15 +1,12 @@
-from Layer.ReLU import ReLU
-from Layer.PReLU import PReLU
 from Layer.Convolution import Convolution
 from Layer.Deconvolution import Deconvolution
-from Layer.Resize import Resize
-from Layer.Dropout import Dropout
-from solve_srcnn import *
+from Layer.PReLU import PReLU
 from Loss.MSELoss import MSELoss
-from srcnn import *
 from Network import *
+from solve_srcnn import *
+from srcnn import *
 
-lr_size = (11, 11)
+lr_size = (7, 7)
 factor = 3
 channel = 3
 filter_size = (5, 1, 3, 1, 9)
@@ -17,7 +14,8 @@ filter_num = (56, 16)  # d s
 hr_size = tuple(item * factor for item in lr_size)
 print("low resolution size: ", lr_size)
 print("high resolution size: ", hr_size)
-train_data, train_label = load_data(["./data/Train/Set91"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel)
+train_data, train_label = load_data(["./data/Train/Set91"], lr_size[0], lr_size[1], factor=factor, size=5000000,
+                                    channel=channel)
 print("train data shape", np.shape(train_data))
 print("train label shape", np.shape(train_label))
 test_data, test_label = load_data(["./data/Test/"], factor=factor, size=500, channel=channel, resize=False)
@@ -51,8 +49,6 @@ optimizer = tf.train.AdamOptimizer(0.0001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
-          save_path="./model_fsrcnn/factor3_51319_3/", load_path="./model_fsrcnn/factor2_51319_3/",
+          save_path="./model_fsrcnn/factor2_51319_3/", load_path=None,
           # save_path="./model_fsrcnn/factor2_test/", load_path=None,
-          save_res_freq=10000)
-
-
+          save_res_freq=1000, test_only=False)

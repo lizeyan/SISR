@@ -21,7 +21,7 @@ def data_iterator(x, y, batch_size, shuffle=True):
 
 def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, disp_freq, test_freq,
               save_res_freq, keep_prob=0.5, summary_dir="./summary",
-              save_path="./model/model/", load_path=None):
+              save_path="./model/model/", load_path=None, test_only=False):
     saver = tf.train.Saver()
     sess = tf.InteractiveSession()
     param_counter = tf.zeros([1], dtype=tf.int32)
@@ -42,30 +42,33 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
             sess.run(tf.global_variables_initializer())
     summary_writer = tf.summary.FileWriter(summary_dir, sess.graph)
     tic = time.time()
-    loss_list = []
-    iter_counter = 0
-    for k in range(max_epoch):
-        for x, y in data_iterator(train_x, train_y, batch_size):
-            iter_counter += 1
-            summary, _, loss, sr = sess.run([model.merged, model.train_step, model.loss, model.sr],
-                                            feed_dict={
-                                                model.input_placeholder: x,
-                                                model.label_placeholder: y})
-            loss_list.append(loss)
-            if disp_freq is not None and iter_counter % disp_freq == 0:
-                psnr = evaluation_PSNR(sr, y)
-                log('Iter:%d, train PSNR: %f, mean loss: %f' % (iter_counter, psnr, np.mean(loss_list)))
-                summary_writer.add_summary(summary, iter_counter)
-            if test_freq is not None and iter_counter % test_freq == 0:
-                log("Testing......")
-                test_PSNR, test_time = test(model, test_x, test_y, iter_counter % save_res_freq == 0)
-                log("Iter:%d, test PSNR: %f, test FPS: %f fps" % (iter_counter, test_PSNR, 1.0 / test_time))
-                saved = saver.save(sess, save_path=save_path, global_step=iter_counter + 1)
-                log("Model saved in %s" % saved)
-                loss_list.clear()
+    if test_only:
+        test(model, test_x, test_y, True)
+    else:
+        loss_list = []
+        iter_counter = 0
+        for k in range(max_epoch):
+            for x, y in data_iterator(train_x, train_y, batch_size):
+                iter_counter += 1
+                summary, _, loss, sr = sess.run([model.merged, model.train_step, model.loss, model.sr],
+                                                feed_dict={
+                                                    model.input_placeholder: x,
+                                                    model.label_placeholder: y})
+                loss_list.append(loss)
+                if disp_freq is not None and iter_counter % disp_freq == 0:
+                    psnr = evaluation_PSNR(sr, y)
+                    log('Iter:%d, train PSNR: %f, mean loss: %f' % (iter_counter, psnr, np.mean(loss_list)))
+                    summary_writer.add_summary(summary, iter_counter)
+                if test_freq is not None and iter_counter % test_freq == 0:
+                    log("Testing......")
+                    test_PSNR, test_time = test(model, test_x, test_y, iter_counter % save_res_freq == 0)
+                    log("Iter:%d, test PSNR: %f, test FPS: %f fps" % (iter_counter, test_PSNR, 1.0 / test_time))
+                    saved = saver.save(sess, save_path=save_path, global_step=iter_counter + 1)
+                    log("Model saved in %s" % saved)
+                    loss_list.clear()
 
     toc = time.time()
-    log("Total train time: %dseconds" % (toc - tic))
+    log("Total elapsed time: %dseconds" % (toc - tic))
 
 
 def test(model, test_x, test_y, save_output=True):

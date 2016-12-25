@@ -7,6 +7,7 @@ import numpy as np
 这个文件负责处理所有的SRCNN问题数据的准备,结果的处理等琐碎的工作
 '''
 
+
 def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1, resize=False):
     '''
     :param dir_list: 要遍历的目录列表
@@ -15,6 +16,7 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1,
     :param factor: 从LR到HR的放大倍数,长和宽分别放大.
     :param size: 加载的图片数量
     :param channel
+    :param resize
     :return: 图片的列表 data, label
     这些列表的类型应当为numpy ndarray
     '''
@@ -33,6 +35,7 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1,
             data, label = walk_and_load_image(d,
                                               hr_size=(hr_width, hr_height),
                                               lr_size=(width, height),
+                                              factor=factor,
                                               length=size,
                                               channel=channel,
                                               resize=resize)
@@ -62,9 +65,10 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
             if not file.endswith(('jpg', 'JPEG', 'png', 'JPG', 'bmp')):
                 continue
             with Image.open(os.path.join(dirName, file)) as img:
+                img_width, img_height = img.size
                 if hr_size is None or lr_size is None:
                     lrs = tuple((int(item / factor) for item in img.size))
-                    hrs = tuple((item * factor  for item in lrs))
+                    hrs = tuple((item * factor for item in lrs))
                     lr = np.asarray(img.resize(lrs))
                     hr = np.asarray(img.resize(hrs))
                     if len(lr.shape) == 3:
@@ -80,13 +84,32 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
                     data_list.append(lr)
                     label_list.append(hr)
                 else:
-                    for sub_img in crop(img, hr_size[0], hr_size[1], stride=14):
-                        hr = (np.asarray(sub_img))
-                        lr = (np.asarray(sub_img.resize(lr_size)))
+                    stride = 3
+                    lr_img_size = (round(img_width / factor), round(img_height / factor))
+                    hr_img_size = (lr_img_size[0] * factor, lr_img_size[1] * factor)
+                    lr_images = crop(img.resize(lr_img_size),
+                                     lr_size[0], lr_size[1], stride)
+                    hr_images = crop(img.resize(hr_img_size),
+                                     hr_size[0], hr_size[1], stride * factor)
+                    # print(len(lr_images), len(hr_images))
+                    assert len(lr_images) == len(hr_images), "Length of LR images and HR images is not the same."
+                    for lr, hr in zip(lr_images, hr_images):
+                        lr = np.asarray(lr)
+                        hr = np.asarray(hr)
                         if len(lr.shape) == 3:
                             for left in range(0, lr.shape[2] - channel + 1, channel):
                                 data_list.append(lr[:, :, left:left + channel])
                                 label_list.append(hr[:, :, left:left + channel])
+                        elif len(lr.shape) == 2:
+                            data_list.append(lr[:, :, None])
+                            label_list.append(hr[:, :, None])
+                    # for sub_img in crop(img, hr_size[0], hr_size[1], stride=14):
+                    #     hr = (np.asarray(sub_img))
+                    #     lr = (np.asarray(sub_img.resize(lr_size)))
+                    #     if len(lr.shape) == 3:
+                    #         for left in range(0, lr.shape[2] - channel + 1, channel):
+                    #             data_list.append(lr[:, :, left:left + channel])
+                    #             label_list.append(hr[:, :, left:left + channel])
                         # elif len(lr.shape) == 2:
                         #     data_list.append(lr[:, :, None])
                         #     label_list.append(hr[:, :, None])
