@@ -20,7 +20,7 @@ print("high resolution size: ", hr_size)
 train_data, train_label = load_data(["./data/Train/Set91"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel)
 print("train data shape", np.shape(train_data))
 print("train label shape", np.shape(train_label))
-test_data, test_label = load_data(["./data/Test/Set5"], factor=factor, size=5, channel=channel)
+test_data, test_label = load_data(["./data/Test/"], factor=factor, size=19, channel=channel)
 print("The real size of train data set is: %d" % len(train_data))
 print("The real size of test data set is: %d" % len(test_data))
 
@@ -46,7 +46,7 @@ model.add(Deconvolution(name="Deconvolution", kernel_size=filter_size[4],
                         factor=factor))
 
 loss = MSELoss('MSELoss', hr_size[0], hr_size[1])
-optimizer = tf.train.AdamOptimizer(0.00001)
+optimizer = tf.train.AdamOptimizer(0.000001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
