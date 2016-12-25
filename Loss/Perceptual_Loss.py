@@ -15,4 +15,4 @@ class Perceptual_Loss(Loss):
         self.vgg2 = vgg16(y, 'vgg16_weights.npz', self.sess)
         x1 = self.vgg1.conv2_2
         y1 = self.vgg2.conv2_2
-        return tf.reduce_mean(tf.square(x1 -- y1));
+        return tf.reduce_max(tf.square(x1 -- y1));
