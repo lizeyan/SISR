@@ -20,7 +20,7 @@ print("high resolution size: ", hr_size)
 train_data, train_label = load_data(["./data/Train/Set91"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel)
 print("train data shape", np.shape(train_data))
 print("train label shape", np.shape(train_label))
-test_data, test_label = load_data(["./data/Test/"], factor=factor, size=19, channel=channel)
+test_data, test_label = load_data(["./data/Test/Set5"], factor=factor, size=19, channel=channel)
 print("The real size of train data set is: %d" % len(train_data))
 print("The real size of test data set is: %d" % len(test_data))
 
@@ -45,13 +45,14 @@ model.add(Deconvolution(name="Deconvolution", kernel_size=filter_size[4],
                         inputs_dim=filter_num[0], num_output=channel, init_std=1e-4,
                         factor=factor))
 
-loss = MSELoss('MSELoss', hr_size[0], hr_size[1])
-optimizer = tf.train.AdamOptimizer(0.000001)
+loss = MSELoss('MSELoss')
+optimizer = tf.train.AdamOptimizer(0.0001)
+# optimizer = tf.train.GradientDescentOptimizer(0.0000001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
           save_path="./model_fsrcnn/factor2_51319_3/", load_path="./model_fsrcnn/factor2_51319_3/",
-          #save_path="./model_fsrcnn/factor2_test/", load_path=None,
-          save_res_freq=100000)
+          # save_path="./model_fsrcnn/factor2_test/", load_path=None,
+          save_res_freq=1000)
 
 

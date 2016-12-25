@@ -36,7 +36,7 @@ model.add(Convolution('Mapping', filter_size[1], filter_num[0], filter_num[1], 0
 model.add(PReLU('prelu2'))
 model.add(Convolution('Reconstruction', filter_size[2], filter_num[1], channel, 0.0001))
 
-loss = MSELoss('MSELoss', hr_size[0], hr_size[1])
+loss = MSELoss('MSELoss')
 optimizer = tf.train.AdamOptimizer(0.0001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,

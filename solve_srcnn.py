@@ -58,8 +58,8 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
                 summary_writer.add_summary(summary, iter_counter)
             if test_freq is not None and iter_counter % test_freq == 0:
                 log("Testing......")
-                test_PSNR = test(model, test_x, test_y, iter_counter % save_res_freq == 0)
-                log("Iter:%d, test PSNR: %f" % (iter_counter, test_PSNR))
+                test_PSNR, test_time = test(model, test_x, test_y, iter_counter % save_res_freq == 0)
+                log("Iter:%d, test PSNR: %f, test FPS: %f fps" % (iter_counter, test_PSNR, 1.0 / test_time))
                 saved = saver.save(sess, save_path=save_path, global_step=iter_counter + 1)
                 log("Model saved in %s" % saved)
                 loss_list.clear()
@@ -70,12 +70,16 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
 
 def test(model, test_x, test_y, save_output=True):
     test_PSNR = []
+    time_list = []
     counter = 0
     channel = test_x[0].shape[2]
     for x, y in data_iterator(test_x, test_y, 1, shuffle=False):
+        tic = time.time()
         sr = model.sr.eval(feed_dict={model.input_placeholder: [x[0]],
                                       model.label_placeholder: [y[0]],
                                       model.keep_prob_placeholder: 1.0})
+        toc = time.time()
+        time_list.append(toc-tic)
         psnr = evaluation_PSNR(sr, [y[0]])
         test_PSNR.append(psnr)
         if save_output:
@@ -92,25 +96,10 @@ def test(model, test_x, test_y, save_output=True):
                 lr_img.save("./test_results/%d_input.jpg" % counter)
                 hr_img.save("./test_results/%d_label.jpg" % counter)
                 hr_pdt.save("./test_results/%d_predict_%f.jpg" % (counter, psnr))
-    return np.mean(test_PSNR)
+    return np.mean(test_PSNR), np.mean(time_list)
 
 
 def evaluation_PSNR(data, label):
-    # data = np.asarray(data)
-    # label = np.asarray(label)
-    # width_data, height_data = data.shape[1:3]
-    # width_label, height_label = label.shape[1:3]
-    # width = min(width_data, width_label)
-    # height = min(height_data, height_label)
-    # border_data_width = int((width_data - width) / 2)
-    # border_data_height = int((height_data - height) / 2)
-    # border_label_width = int((width_label - width) / 2)
-    # border_label_height = int((height_label - height) / 2)
-    # data_center = data[:, border_data_width:border_data_width + width, border_data_height:border_data_height + height,
-    #               :]
-    # label_center = label[:, border_label_width:border_label_width + width,
-    #                border_label_height:border_label_height + height, :]
-    # mse = np.mean((data_center - label_center) ** 2)
-    mse = np.mean((data - label) ** 2)
+    mse = np.mean(np.square(data - label))
     return 20 * np.log10(255) - 10 * np.log10(mse)
 
