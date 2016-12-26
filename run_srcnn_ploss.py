@@ -10,7 +10,7 @@ from srcnn import *
 from Network import *
 
 lr_size = (32, 32)
-factor = 8
+factor = 2
 channel = 3
 filter_size = (9, 1, 5)
 filter_num = (64, 32)
@@ -18,7 +18,7 @@ size_loss = sum(filter_size) - len(filter_size)
 hr_size = tuple(item * factor for item in lr_size)
 print("low resolution size: ", lr_size)
 print("high resolution size: ", hr_size)
-train_data, train_label = load_data(["./data/Train/Set91"], lr_size[0], lr_size[1], factor=factor, size=10000, channel=channel)
+train_data, train_label = load_data(["./data/Train/G100"], lr_size[0], lr_size[1], factor=factor, size=10000, channel=channel)
 print("train data shape", np.shape(train_data))
 print("train label shape", np.shape(train_label))
 test_data, test_label = load_data(["./data/Test/Set5"], factor=factor, size=5, channel=channel)

@@ -9,7 +9,7 @@ from srcnn import *
 from Network import *
 
 lr_size = (16, 16)
-factor = 2
+factor = 3
 channel = 3
 filter_size = (9, 1, 5)
 filter_num = (64, 32)
@@ -41,7 +41,7 @@ optimizer = tf.train.AdamOptimizer(0.0001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
-          save_path="./model_srcnn/factor2_915_3/", load_path="./model_srcnn/factor2_915_3/",
+          save_path="./model_srcnn/factor3_915_3/", load_path="./model_srcnn/factor3_915_3/",
           save_res_freq=100000)
 
 
