@@ -84,7 +84,7 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
                     data_list.append(lr)
                     label_list.append(hr)
                 else:
-                    stride = 3
+                    stride = 5
                     lr_img_size = (round(img_width / factor), round(img_height / factor))
                     hr_img_size = (lr_img_size[0] * factor, lr_img_size[1] * factor)
                     lr_images = crop(img.resize(lr_img_size),
