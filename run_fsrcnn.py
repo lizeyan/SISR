@@ -6,7 +6,7 @@ from Network import *
 from solve_srcnn import *
 from srcnn import *
 
-lr_size = (7, 7)
+lr_size = (16, 16)
 factor = 3
 channel = 3
 filter_size = (5, 1, 3, 1, 9)
@@ -15,11 +15,12 @@ m = 4
 hr_size = tuple(item * factor for item in lr_size)
 print("low resolution size: ", lr_size)
 print("high resolution size: ", hr_size)
-train_data, train_label = load_data(["./data/Train/Set91", "./data/Train/G100"], lr_size[0], lr_size[1], factor=factor, size=5000000,
+# train_data, train_label = load_data(["./data/Train/Set91", "./data/Train/G100"], lr_size[0], lr_size[1], factor=factor, size=5000000,
+train_data, train_label = load_data(["./data/Train/Set5", "./data/Train/Set14"], lr_size[0], lr_size[1], factor=factor, size=5000000,
                                     channel=channel)
 print("train data shape", np.shape(train_data))
 print("train label shape", np.shape(train_label))
-test_data, test_label = load_data(["./data/Test"], factor=factor, size=500, channel=channel, resize=False)
+test_data, test_label = load_data(["./data/Test"], factor=factor, size=500000, channel=channel, resize=False)
 print("The real size of train data set is: %d" % len(train_data))
 print("The real size of test data set is: %d" % len(test_data))
 
@@ -49,11 +50,11 @@ model.add(Deconvolution(name="Deconvolution", kernel_size=filter_size[4],
                         factor=factor))
 
 loss = MSELoss('MSELoss')
-optimizer = tf.train.AdamOptimizer(0.00001)
+optimizer = tf.train.AdamOptimizer(0.00005)
 # optimizer = tf.train.GradientDescentOptimizer(0.0000001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
-          batch_size=4, max_epoch=100000000, disp_freq=100, test_freq=1000,
+          batch_size=8, max_epoch=100000000, disp_freq=100, test_freq=1000,
           save_path="./model_fsrcnn/factor3_51319_3/", load_path="./model_fsrcnn/factor3_51319_3/",
           # save_path="./model_fsrcnn/factor2_test/", load_path=None,
           save_res_freq=10000, test_only=False)

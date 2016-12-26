@@ -26,5 +26,5 @@ class Deconvolution(Layer):
                                                         self.num_output],
                                           strides=[1, self.factor, self.factor, 1],
                                           padding="SAME", data_format="NHWC")
-            return conv
+            return tf.nn.bias_add(conv, self.bias, data_format="NHWC")
             # return tf.nn.conv2d(inputs, self.weight, strides=[1, 1, 1, 1], padding="VALID")
