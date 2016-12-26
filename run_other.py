@@ -16,7 +16,7 @@ class Test(object):
         self.test_label = []
 
     def load_test_data(self):
-        self.test_data, self.test_label = load_data(["./data/Test/Set5"], factor=self.factor, channel=3, size=1000000)
+        self.test_data, self.test_label = load_data(["./data/Test/Set5"], 128, 128, factor=self.factor, channel=3, size=100)
 
     def test_bicubic(self):
         res = []
@@ -24,10 +24,11 @@ class Test(object):
             hr_image = Image.fromarray(self.test_label[i])
             lr_image = Image.fromarray(self.test_data[i])
             hr_pdt = lr_image.resize(hr_image.size, Image.BICUBIC)
-            res.append(evaluation_PSNR(np.asarray(hr_pdt), np.asarray(hr_image)))
+            psnr = evaluation_PSNR(np.asarray(hr_pdt), np.asarray(hr_image))
+            res.append(psnr)
             lr_image.save("./test_results/%d_input.jpg" % (i+1))
             hr_image.save("./test_results/%d_label.jpg" % (i+1))
-            hr_pdt.save("./test_results/%d_bicubic.jpg" % (i+1))
+            hr_pdt.save("./test_results/%d_bicubic_%f.jpg" % (i+1, psnr))
         return np.mean(res)
 
     def test_bilinear(self):
