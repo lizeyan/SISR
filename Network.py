@@ -22,6 +22,7 @@ class Network(object):
         x = input_placeholder
         for layer in self.layer_list:
             x = layer.forward(x)
+        x = tf.minimum(255.0, x)
         self.sr = x
         self.input_placeholder = input_placeholder
         self.label_placeholder = label_placeholder

@@ -8,7 +8,7 @@ from Loss.MSELoss import MSELoss
 from srcnn import *
 from Network import *
 
-lr_size = (16, 16)
+lr_size = (7, 7)
 factor = 3
 channel = 3
 filter_size = (9, 3, 5)
@@ -21,7 +21,7 @@ print("high resolution size: ", hr_size)
 train_data, train_label = load_data(["./data/Train/Set5", "./data/Train/Set14"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel)
 print("train data shape", np.shape(train_data))
 print("train label shape", np.shape(train_label))
-test_data, test_label = load_data(["./data/Test"], factor=factor, size=500, channel=channel)
+test_data, test_label = load_data(["./data/Test/Set14"], factor=factor, size=500, channel=channel)
 print("The real size of train data set is: %d" % len(train_data))
 print("The real size of test data set is: %d" % len(test_data))
 

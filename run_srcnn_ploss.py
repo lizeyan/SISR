@@ -11,14 +11,14 @@ from Network import *
 
 lr_size = (32, 32)
 factor = 2
-channel = 3
+channel = 1
 filter_size = (9, 1, 5)
 filter_num = (64, 32)
 size_loss = sum(filter_size) - len(filter_size)
 hr_size = tuple(item * factor for item in lr_size)
 print("low resolution size: ", lr_size)
 print("high resolution size: ", hr_size)
-train_data, train_label = load_data(["./data/Train/Train"], lr_size[0], lr_size[1], factor=factor, size=10000, channel=channel)
+train_data, train_label = load_data(["./data/Train/Set5"], lr_size[0], lr_size[1], factor=factor, size=10000, channel=channel)
 print("train data shape", np.shape(train_data))
 print("train label shape", np.shape(train_label))
 test_data, test_label = load_data(["./data/Test/Set5"], factor=factor, size=5, channel=channel)
@@ -38,7 +38,7 @@ model.add(PReLU('prelu2'))
 model.add(Convolution('Reconstruction', filter_size[2], filter_num[1], channel, 0.0001))
 
 loss1 = Perceptual_Loss('Perceptual_Loss')
-optimizer = tf.train.AdamOptimizer(0.00001)
+optimizer = tf.train.AdamOptimizer(0.000001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss1, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
