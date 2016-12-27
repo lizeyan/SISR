@@ -22,13 +22,14 @@ class Network(object):
         x = input_placeholder
         for layer in self.layer_list:
             x = layer.forward(x)
-        x = tf.minimum(255.0, x)
         self.sr = x
         self.input_placeholder = input_placeholder
         self.label_placeholder = label_placeholder
         self.keep_prob_placeholder = keep_prob_placeholder
         self.loss = loss.forward(self.sr, label_placeholder)
         tf.summary.scalar(name="loss", tensor=self.loss)
+        tf.summary.scalar(name="max", tensor=tf.reduce_max(self.sr))
+        tf.summary.scalar(name="min", tensor=tf.reduce_min(self.sr))
         self.train_step = optimizer.minimize(self.loss)
         self.merged = tf.summary.merge_all()
         log("Compile finished")

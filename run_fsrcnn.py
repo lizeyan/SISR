@@ -15,8 +15,8 @@ m = 4
 hr_size = tuple(item * factor for item in lr_size)
 print("low resolution size: ", lr_size)
 print("high resolution size: ", hr_size)
-train_data, train_label = load_data(["./data/Train/Set91", "./data/Train/G100", "./data/Train/Set5", "./data/Train/Set14"], lr_size[0], lr_size[1], factor=factor, size=5000000,
-# train_data, train_label = load_data(["./data/Train/Set5", "./data/Train/Set14"], lr_size[0], lr_size[1], factor=factor, size=5000000,
+train_data, train_label = load_data(["./data/Train/Set91", "./data/Train/G100"],
+                                    lr_size[0], lr_size[1], factor=factor, size=5000000,
                                     channel=channel)
 print("train data shape", np.shape(train_data))
 print("train label shape", np.shape(train_label))
@@ -39,8 +39,8 @@ model.add(PReLU('prelu_shrinking'))
 for i in range(m):
     model.add(Convolution(name="Mapping_%d" % i, kernel_size=filter_size[2],
                           inputs_dim=filter_num[1], num_output=filter_num[1], init_std=1e-4))
-    
-model.add(PReLU('prelu_mapping'))
+    model.add(PReLU('prelu_mapping_%d' % i))
+
 
 model.add(Convolution(name="Expanding", kernel_size=filter_size[3],
                       inputs_dim=filter_num[1], num_output=filter_num[0], init_std=1e-4))
@@ -50,7 +50,7 @@ model.add(Deconvolution(name="Deconvolution", kernel_size=filter_size[4],
                         factor=factor))
 
 loss = MSELoss('MSELoss')
-optimizer = tf.train.AdamOptimizer(0.000005)
+optimizer = tf.train.AdamOptimizer(0.001)
 # optimizer = tf.train.GradientDescentOptimizer(0.0000001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
