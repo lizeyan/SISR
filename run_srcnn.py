@@ -8,10 +8,10 @@ from Loss.MSELoss import MSELoss
 from srcnn import *
 from Network import *
 
-lr_size = (7, 7)
+lr_size = (16, 16)
 factor = 3
 channel = 3
-filter_size = (9, 3, 5)
+filter_size = (9, 1, 5)
 filter_num = (64, 32)
 size_loss = sum(filter_size) - len(filter_size)
 hr_size = tuple(item * factor for item in lr_size)
@@ -32,16 +32,16 @@ keep_prob_placeholder = tf.placeholder(tf.float32, name="keep_prob")
 model = Network()
 model.add(Resize('resize', factor))
 model.add(Convolution('Patch_extraction', filter_size[0], channel, filter_num[0], 0.0001))
-model.add(PReLU('prelu1'))
+model.add(ReLU('relu1'))
 model.add(Convolution('Mapping', filter_size[1], filter_num[0], filter_num[1], 0.0001))
-model.add(PReLU('prelu2'))
+model.add(ReLU('relu2'))
 model.add(Convolution('Reconstruction', filter_size[2], filter_num[1], channel, 0.0001))
 
 loss = MSELoss('MSELoss')
-optimizer = tf.train.AdamOptimizer(0.0001)
+optimizer = tf.train.AdamOptimizer(0.001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
-          batch_size=4, max_epoch=1000000, disp_freq=100, test_freq=1000,
+          batch_size=128, max_epoch=1000000, disp_freq=100, test_freq=1000,
           save_path="./model_srcnn/factor3_935_3/", load_path="./model_srcnn/factor3_935_3/",
           save_res_freq=100000)
 

@@ -12,11 +12,11 @@ def data_iterator(x, y, batch_size, shuffle=True):
     if shuffle:
         np.random.shuffle(index)
 
-    x = x[index]
-    y = y[index]
+    sx = x[index]
+    sy = y[index]
     for start_idx in range(0, length, batch_size):
         end_idx = min(start_idx + batch_size, length)
-        yield x[start_idx:end_idx], y[start_idx:end_idx]
+        yield sx[start_idx:end_idx], sy[start_idx:end_idx]
 
 
 def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, disp_freq, test_freq,
