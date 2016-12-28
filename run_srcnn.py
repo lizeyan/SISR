@@ -15,6 +15,7 @@ filter_size = (9, 1, 5)
 filter_num = (64, 32)
 size_loss = sum(filter_size) - len(filter_size)
 hr_size = tuple(item * factor for item in lr_size)
+target_size = tuple(item - sum(filter_size) + len(filter_size) for item in hr_size)
 print("low resolution size: ", lr_size)
 print("high resolution size: ", hr_size)
 # train_data, train_label = load_data(["./data/Train/Set91", "./data/Train/G100"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel)
@@ -37,7 +38,7 @@ model.add(Convolution('Mapping', filter_size[1], filter_num[0], filter_num[1], 0
 model.add(ReLU('relu2'))
 model.add(Convolution('Reconstruction', filter_size[2], filter_num[1], channel, 0.0001))
 
-loss = MSELoss('MSELoss')
+loss = MSELoss('MSELoss', target_height=target_size[0], target_width=target_size[1])
 optimizer = tf.train.AdamOptimizer(0.001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
