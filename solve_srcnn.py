@@ -79,7 +79,9 @@ def test(sess, model, test_x, test_y, save_output=True):
     channel = test_x[0].shape[2]
     for x, y in data_iterator(test_x, test_y, 1, shuffle=False):
         tic = time.time()
+        print(x[0].shape)
         sr = sess.run(model.sr, feed_dict={model.input_placeholder: [x[0]], model.label_placeholder: [y[0]]})
+        print(sr.shape)
         toc = time.time()
         time_list.append(toc-tic)
         loss = evaluation_mse(sr, [y[0]])

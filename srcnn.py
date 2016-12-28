@@ -8,7 +8,7 @@ import numpy as np
 '''
 
 
-def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1, resize=False):
+def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1, resize=False, boarder_loss=0):
     '''
     :param dir_list: 要遍历的目录列表
     :param width: LR图片的宽度
@@ -20,6 +20,7 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1,
     :return: 图片的列表 data, label
     这些列表的类型应当为numpy ndarray
     '''
+    assert boarder_loss % 2 == 0, "boarder loos is not even number"
     if width is not None:
         hr_width = width * factor
     else:
@@ -38,12 +39,14 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1,
                                               factor=factor,
                                               length=size,
                                               channel=channel,
-                                              resize=resize)
+                                              resize=resize,
+                                              boarder_loss=boarder_loss)
         else:
             data, label = walk_and_load_image(d, hr_size=None,
                                               lr_size=None, factor=factor,
                                               length=size, channel=channel,
-                                              resize=False)
+                                              resize=False,
+                                              boarder_loss=boarder_loss)
         read_data.extend(data)
         read_label.extend(label)
 
@@ -53,12 +56,13 @@ def load_data(dir_list, width=None, height=None, factor=2, size=1000, channel=1,
     return np.asarray(read_data), np.asarray(read_label)
 
 
-def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channel=1, resize=False):
+def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channel=1, resize=False, boarder_loss=0):
     '''
     遍历目录并且得到所有的图片文件
     '''
     data_list = []
     label_list = []
+    boundary = int(boarder_loss / 2)
     for dirName, subdirList, fileList in os.walk(directory):
         log("Travelling Directory: %s" % os.path.abspath(dirName))
         for file in fileList:
@@ -74,7 +78,7 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
                     if len(lr.shape) == 3:
                         for left in range(0, lr.shape[2] - channel + 1, channel):
                             data_list.append(lr[:, :, left:left + channel])
-                            label_list.append(hr[:, :, left:left + channel])
+                            label_list.append(hr[boundary:hr.shape[0]-boundary, boundary:hr.shape[1]-boundary, left:left + channel])
                     # elif len(lr.shape) == 2:
                     #     data_list.append(lr[:, :, None])
                     #     label_list.append(hr[:, :, None])
@@ -82,7 +86,7 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
                     hr = np.asarray(img.resize(hr_size))
                     lr = np.asarray(img.resize(lr_size))
                     data_list.append(lr)
-                    label_list.append(hr)
+                    label_list.append(hr[boundary:hr.shape[0]-boundary, boundary:hr.shape[1]-boundary, :])
                 else:
                     stride = 5
                     lr_img_size = (round(img_width / factor), round(img_height / factor))
@@ -99,10 +103,10 @@ def walk_and_load_image(directory, length, hr_size, lr_size, factor=None, channe
                         if len(lr.shape) == 3:
                             for left in range(0, lr.shape[2] - channel + 1, channel):
                                 data_list.append(lr[:, :, left:left + channel])
-                                label_list.append(hr[:, :, left:left + channel])
+                                label_list.append(hr[boundary:hr.shape[0]-boundary, boundary:hr.shape[1]-boundary, left:left + channel])
                         elif len(lr.shape) == 2:
                             data_list.append(lr[:, :, None])
-                            label_list.append(hr[:, :, None])
+                            label_list.append(hr[boundary:hr.shape[0]-boundary, boundary:hr.shape[1]-boundary, :])
                     # for sub_img in crop(img, hr_size[0], hr_size[1], stride=14):
                     #     hr = (np.asarray(sub_img))
                     #     lr = (np.asarray(sub_img.resize(lr_size)))

@@ -13,15 +13,16 @@ filter_size = (5, 1, 3, 1, 9)
 filter_num = (56, 16)  # d s
 m = 4
 hr_size = tuple(item * factor for item in lr_size)
-target_size = tuple((item - 4) * factor for item in lr_size)
+boarder_loss = 4 * factor
 log("low resolution size: " + str(lr_size))
 log("high resolution size: " + str(hr_size))
 train_data, train_label = load_data(["./data/Train/Set91"],
                                     lr_size[0], lr_size[1], factor=factor, size=5000000,
-                                    channel=channel)
+                                    channel=channel, boarder_loss=boarder_loss)
 log("train data shape" + str(np.shape(train_data)))
 log("train label shape" + str(np.shape(train_label)))
-test_data, test_label = load_data(["./data/Test"], factor=factor, size=500000, channel=channel, resize=False)
+test_data, test_label = load_data(["./data/Test"], factor=factor, size=500000, channel=channel,
+                                  resize=False, boarder_loss=boarder_loss)
 log("The real size of train data set is: %d" % len(train_data))
 log("The real size of test data set is: %d" % len(test_data))
 
@@ -51,7 +52,7 @@ model.add(Deconvolution(name="Deconvolution", kernel_size=filter_size[4],
                         inputs_dim=filter_num[0], num_output=channel, init_std=1e-3,
                         factor=factor))
 
-loss = MSELoss('MSELoss', target_size[0], target_size[1])
+loss = MSELoss('MSELoss')
 optimizer = tf.train.AdamOptimizer(0.001)
 # optimizer = tf.train.GradientDescentOptimizer(0.0000001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
