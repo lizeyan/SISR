@@ -79,9 +79,7 @@ def test(sess, model, test_x, test_y, save_output=True):
     channel = test_x[0].shape[2]
     for x, y in data_iterator(test_x, test_y, 1, shuffle=False):
         tic = time.time()
-        print(x[0].shape)
         sr = sess.run(model.sr, feed_dict={model.input_placeholder: [x[0]], model.label_placeholder: [y[0]]})
-        print(sr.shape)
         toc = time.time()
         time_list.append(toc-tic)
         loss = evaluation_mse(sr, [y[0]])
@@ -107,17 +105,8 @@ def test(sess, model, test_x, test_y, save_output=True):
 def evaluation_mse(data, label):
     data = np.asarray(data)
     label = np.asarray(label)
-    width_data, height_data = data.shape[1:3]
-    width_label, height_label = label.shape[1:3]
-    width = min(width_data, width_label)
-    height = min(height_data, height_label)
-    border_data_width = int((width_data - width) / 2)
-    border_data_height = int((height_data - height) / 2)
-    border_label_width = int((width_label - width) / 2)
-    border_label_height = int((height_label - height) / 2)
-    data_center = data[:, border_data_width:border_data_width + width, border_data_height:border_data_height + height, :]
-    label_center = label[:, border_label_width:border_label_width + width, border_label_height:border_label_height + height, :]
-    return np.mean((data_center - label_center) ** 2)
+    assert data.shape == label.shape, "data and label have different shape"
+    return np.mean((data - label) ** 2)
 
 
 def evaluation_psnr(loss):
