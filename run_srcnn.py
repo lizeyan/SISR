@@ -8,21 +8,21 @@ from Loss.MSELoss import MSELoss
 from srcnn import *
 from Network import *
 
-lr_size = (16, 16)
+lr_size = (7, 7)
 factor = 3
 channel = 3
 filter_size = (9, 1, 5)
 filter_num = (64, 32)
 size_loss = sum(filter_size) - len(filter_size)
 hr_size = tuple(item * factor for item in lr_size)
-target_size = tuple(item - sum(filter_size) + len(filter_size) for item in hr_size)
+boarder_loss = 12
 print("low resolution size: ", lr_size)
 print("high resolution size: ", hr_size)
 # train_data, train_label = load_data(["./data/Train/Set91", "./data/Train/G100"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel)
-train_data, train_label = load_data(["./data/Train/Set5", "./data/Train/Set14"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel)
+train_data, train_label = load_data(["./data/Train/Set5", "./data/Train/Set14"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel, boarder_loss=boarder_loss)
 print("train data shape", np.shape(train_data))
 print("train label shape", np.shape(train_label))
-test_data, test_label = load_data(["./data/Test"], factor=factor, size=500, channel=channel)
+test_data, test_label = load_data(["./data/Test"], factor=factor, size=500, channel=channel, boarder_loss=boarder_loss)
 print("The real size of train data set is: %d" % len(train_data))
 print("The real size of test data set is: %d" % len(test_data))
 
@@ -38,7 +38,7 @@ model.add(Convolution('Mapping', filter_size[1], filter_num[0], filter_num[1], 0
 model.add(ReLU('relu2'))
 model.add(Convolution('Reconstruction', filter_size[2], filter_num[1], channel, 0.0001))
 
-loss = MSELoss('MSELoss', target_height=target_size[0], target_width=target_size[1])
+loss = MSELoss('MSELoss')
 optimizer = tf.train.AdamOptimizer(0.001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,

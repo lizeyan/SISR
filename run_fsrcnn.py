@@ -16,7 +16,7 @@ hr_size = tuple(item * factor for item in lr_size)
 boarder_loss = 4 * factor
 log("low resolution size: " + str(lr_size))
 log("high resolution size: " + str(hr_size))
-train_data, train_label = load_data(["./data/Train/Set91"],
+train_data, train_label = load_data(["./data/Train/Set5", "./data/Train/Set14"],
                                     lr_size[0], lr_size[1], factor=factor, size=5000000,
                                     channel=channel, boarder_loss=boarder_loss)
 log("train data shape" + str(np.shape(train_data)))
