@@ -16,7 +16,7 @@ hr_size = tuple(item * factor for item in lr_size)
 boarder_loss = 4 * factor
 log("low resolution size: " + str(lr_size))
 log("high resolution size: " + str(hr_size))
-train_data, train_label = load_data(["./data/Train/Set5", "./data/Train/Set14"],
+train_data, train_label = load_data(["./data/Train/Set91", "./data/Train/G100"],
                                     lr_size[0], lr_size[1], factor=factor, size=5000000,
                                     channel=channel, boarder_loss=boarder_loss)
 log("train data shape" + str(np.shape(train_data)))
@@ -57,7 +57,7 @@ optimizer = tf.train.AdamOptimizer(0.001)
 # optimizer = tf.train.GradientDescentOptimizer(0.0000001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
-          batch_size=128, max_epoch=100000000, disp_freq=100, test_freq=1000,
+          batch_size=4, max_epoch=100000000, disp_freq=100, test_freq=1000,
           save_path="./model_fsrcnn/factor3_51319_3/", load_path="./model_fsrcnn/factor3_51319_3/",
           # save_path="./model_fsrcnn/factor2_test/", load_path=None,
           save_res_freq=10000, test_only=False)
