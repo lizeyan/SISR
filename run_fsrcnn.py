@@ -6,6 +6,31 @@ from Network import *
 from solve_srcnn import *
 from srcnn import *
 
+
+def gen_fsrcnn():
+    gen_model = Network()
+    gen_model.add(Convolution(name="Feature_extraction", kernel_size=filter_size[0],
+                              inputs_dim=channel, num_output=filter_num[0], init_std=1e-3))
+    gen_model.add(PReLU('prelu_feature_extraction'))
+    gen_model.add(Convolution(name="Shrinking", kernel_size=filter_size[1],
+                              inputs_dim=filter_num[0], num_output=filter_num[1], init_std=1e-3))
+    gen_model.add(PReLU('prelu_shrinking'))
+
+    for i in range(m):
+        gen_model.add(Convolution(name="Mapping_%d" % i, kernel_size=filter_size[2],
+                                  inputs_dim=filter_num[1], num_output=filter_num[1], init_std=1e-3,
+                                  padding='SAME'))
+        gen_model.add(PReLU('prelu_mapping_%d' % i))
+
+    gen_model.add(Convolution(name="Expanding", kernel_size=filter_size[3],
+                              inputs_dim=filter_num[1], num_output=filter_num[0], init_std=1e-3))
+    gen_model.add(PReLU('prelu_expanding'))
+    gen_model.add(Deconvolution(name="Deconvolution", kernel_size=filter_size[4],
+                                inputs_dim=filter_num[0], num_output=channel, init_std=1e-3,
+                                factor=factor))
+    return gen_model
+
+
 lr_size = (11, 11)
 factor = 3
 channel = 3
@@ -21,7 +46,8 @@ train_data, train_label = load_data(["./data/Train/Set91", "./data/Train/G100"],
                                     channel=channel, boarder_loss=boarder_loss)
 log("train data shape" + str(np.shape(train_data)))
 log("train label shape" + str(np.shape(train_label)))
-test_data, test_label = load_data(["./data/Test/Set5"], lr_size[0], lr_size[1], factor=factor, size=500000, channel=channel,
+test_data, test_label = load_data(["./data/Test/Set5"], lr_size[0], lr_size[1], factor=factor, size=500000,
+                                  channel=channel,
                                   resize=False, boarder_loss=boarder_loss)
 log("The real size of train data set is: %d" % len(train_data))
 log("The real size of test data set is: %d" % len(test_data))
@@ -30,28 +56,7 @@ input_placeholder = tf.placeholder(tf.float32, name="input_dataa")
 label_placeholder = tf.placeholder(tf.float32, name="input_label")
 keep_prob_placeholder = tf.placeholder(tf.float32, name="keep_prob")
 
-model = Network()
-model.add(Convolution(name="Feature_extraction", kernel_size=filter_size[0],
-                      inputs_dim=channel, num_output=filter_num[0], init_std=1e-3))
-model.add(PReLU('prelu_feature_extraction'))
-model.add(Convolution(name="Shrinking", kernel_size=filter_size[1],
-                      inputs_dim=filter_num[0], num_output=filter_num[1], init_std=1e-3))
-model.add(PReLU('prelu_shrinking'))
-
-for i in range(m):
-    model.add(Convolution(name="Mapping_%d" % i, kernel_size=filter_size[2],
-                          inputs_dim=filter_num[1], num_output=filter_num[1], init_std=1e-3,
-                          padding='SAME'))
-    model.add(PReLU('prelu_mapping_%d' % i))
-
-
-model.add(Convolution(name="Expanding", kernel_size=filter_size[3],
-                      inputs_dim=filter_num[1], num_output=filter_num[0], init_std=1e-3))
-model.add(PReLU('prelu_expanding'))
-model.add(Deconvolution(name="Deconvolution", kernel_size=filter_size[4],
-                        inputs_dim=filter_num[0], num_output=channel, init_std=1e-3,
-                        factor=factor))
-
+model = gen_fsrcnn()
 loss = MSELoss('MSELoss')
 optimizer = tf.train.AdamOptimizer(0.001)
 # optimizer = tf.train.GradientDescentOptimizer(0.0000001)
@@ -60,4 +65,4 @@ solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=128, max_epoch=100000000, disp_freq=100, test_freq=1000,
           save_path="./model_fsrcnn/factor3_51319_3/", load_path="./model_fsrcnn/factor3_51319_3/",
           # save_path="./model_fsrcnn/factor2_test/", load_path=None,
-          save_res_freq=10000, test_only=False)
+          save_res_freq=None, test_only=False)

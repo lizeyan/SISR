@@ -62,7 +62,8 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
                     summary_writer.add_summary(summary, iter_counter)
                 if test_freq is not None and iter_counter % test_freq == 0:
                     log("Testing......")
-                    test_PSNR, test_time = test(sess, model, test_x, test_y, iter_counter % save_res_freq == 0)
+                    test_PSNR, test_time = test(sess, model, test_x, test_y,
+                                                save_res_freq is not None and iter_counter % save_res_freq == 0)
                     log("Iter:%d, test PSNR: %f, test FPS: %f fps" % (iter_counter, test_PSNR, 1.0 / test_time))
                     saved = saver.save(sess, save_path=save_path, global_step=iter_counter + 1)
                     log("Model saved in %s" % saved)
@@ -79,18 +80,18 @@ def test(sess, model, test_x, test_y, save_output=True):
     channel = test_x[0].shape[2]
     for x, y in data_iterator(test_x, test_y, 2, shuffle=False):
         tic = time.time()
-        sr = sess.run(model.sr, feed_dict={model.input_placeholder: [x[0]], model.label_placeholder: [y[0]]})
+        sr = sess.run(model.sr, feed_dict={model.input_placeholder: x, model.label_placeholder: y})
         toc = time.time()
-        time_list.append(toc-tic)
-        loss = evaluation_mse(sr, [y[0]])
+        time_list.append(toc - tic)
+        loss = evaluation_mse(sr, y)
         psnr = evaluation_psnr(loss)
         test_psnr.append(psnr)
         if save_output:
             for i in range(len(x)):
                 counter += 1
                 if channel == 1:
-                    lr_img = Image.fromarray(np.squeeze(x[i], axis=(2, )))
-                    hr_img = Image.fromarray(np.squeeze(y[i], axis=(2, )))
+                    lr_img = Image.fromarray(np.squeeze(x[i], axis=(2,)))
+                    hr_img = Image.fromarray(np.squeeze(y[i], axis=(2,)))
                     hr_pdt = Image.fromarray(np.squeeze(np.asarray(sr[i]).astype(np.uint8), axis=(2,)))
                 else:
                     lr_img = Image.fromarray((x[i]).astype(np.uint8))
@@ -111,4 +112,3 @@ def evaluation_mse(data, label):
 
 def evaluation_psnr(loss):
     return 20 * np.log10(255) - 10 * np.log10(loss)
-
