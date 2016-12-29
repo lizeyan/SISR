@@ -77,7 +77,7 @@ def test(sess, model, test_x, test_y, save_output=True):
     time_list = []
     counter = 0
     channel = test_x[0].shape[2]
-    for x, y in data_iterator(test_x, test_y, 1, shuffle=False):
+    for x, y in data_iterator(test_x, test_y, 2, shuffle=False):
         tic = time.time()
         sr = sess.run(model.sr, feed_dict={model.input_placeholder: [x[0]], model.label_placeholder: [y[0]]})
         toc = time.time()

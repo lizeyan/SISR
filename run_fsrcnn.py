@@ -6,7 +6,7 @@ from Network import *
 from solve_srcnn import *
 from srcnn import *
 
-lr_size = (16, 16)
+lr_size = (11, 11)
 factor = 3
 channel = 3
 filter_size = (5, 1, 3, 1, 9)
@@ -21,7 +21,7 @@ train_data, train_label = load_data(["./data/Train/Set91", "./data/Train/G100"],
                                     channel=channel, boarder_loss=boarder_loss)
 log("train data shape" + str(np.shape(train_data)))
 log("train label shape" + str(np.shape(train_label)))
-test_data, test_label = load_data(["./data/Test"], factor=factor, size=500000, channel=channel,
+test_data, test_label = load_data(["./data/Test/Set5"], lr_size[0], lr_size[1], factor=factor, size=500000, channel=channel,
                                   resize=False, boarder_loss=boarder_loss)
 log("The real size of train data set is: %d" % len(train_data))
 log("The real size of test data set is: %d" % len(test_data))
