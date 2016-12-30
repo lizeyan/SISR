@@ -40,10 +40,10 @@ model.add(ReLU('relu2'))
 model.add(Convolution('Reconstruction', filter_size[2], filter_num[1], channel, 0.0001))
 
 loss = Perceptual_Loss('PLoss')
-optimizer = tf.train.AdamOptimizer(0.001)
+optimizer = tf.train.AdamOptimizer(0.0001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=128, max_epoch=1000000, disp_freq=100, test_freq=1000,
-          save_path="./model_srcnn/factor3_935_3/", load_path="./model_srcnn/factor3_935_3/",
+          save_path="./model_srcnn_ploss/factor3_935_3/", load_path="./model_srcnn_ploss/factor3_935_3/",
           save_res_freq=100000)
 

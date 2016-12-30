@@ -58,7 +58,7 @@ keep_prob_placeholder = tf.placeholder(tf.float32, name="keep_prob")
 
 model = gen_fsrcnn()
 loss = MSELoss('MSELoss')
-optimizer = tf.train.AdamOptimizer(0.001)
+optimizer = tf.train.AdamOptimizer(0.0002)
 # optimizer = tf.train.GradientDescentOptimizer(0.0000001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
