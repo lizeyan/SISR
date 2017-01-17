@@ -20,8 +20,8 @@ def gen_srcnn():
     return gen_model
 
 
-lr_size = (11, 11)
-factor = 3
+lr_size = (10, 10)
+factor = 4
 channel = 3
 filter_size = (9, 1, 5)
 filter_num = (64, 32)
@@ -30,7 +30,7 @@ hr_size = tuple(item * factor for item in lr_size)
 boarder_loss = 12
 log("low resolution size: " + str(lr_size))
 log("high resolution size: " + str(hr_size))
-train_data, train_label = load_data(["./data/Train/Set5", "./data/Train/Set14"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel, boarder_loss=boarder_loss)
+train_data, train_label = load_data(["./data/Train/Set91", "./data/Train/G100"], lr_size[0], lr_size[1], factor=factor, size=5000000, channel=channel, boarder_loss=boarder_loss)
 log("train data shape" + str(np.shape(train_data)))
 log("train label shape" + str(np.shape(train_label)))
 test_data, test_label = load_data(["./data/Test/Set5"], lr_size[0], lr_size[1], factor=factor, size=500, channel=channel, boarder_loss=boarder_loss)
@@ -45,6 +45,6 @@ optimizer = tf.train.AdamOptimizer(0.001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=128, max_epoch=1000000, disp_freq=100, test_freq=1000,
-          save_path="./model_srcnn/factor3_935_3/", load_path="./model_srcnn/factor3_935_3/",
+          save_path="./model_srcnn/factor4_915_3/", load_path="./model_srcnn/factor4_915_3/",
           save_res_freq=100000)
 

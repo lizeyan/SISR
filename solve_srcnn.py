@@ -23,7 +23,7 @@ def solve_net(model, train_x, train_y, test_x, test_y, batch_size, max_epoch, di
               save_res_freq, keep_prob=0.5, summary_dir="./summary",
               save_path="./model/model/", load_path=None, test_only=False):
     saver = tf.train.Saver()
-    gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.3333)
+    gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=1.0)
 
     sess = tf.InteractiveSession(config=tf.ConfigProto(gpu_options=gpu_options))
     param_counter = tf.zeros([1], dtype=tf.int32)

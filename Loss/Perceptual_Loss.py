@@ -14,6 +14,6 @@ class Perceptual_Loss(Loss):
     def forward(self, x, y):
         self.vgg1 = vgg16(x, 'vgg16_weights.npz', self.sess1)
         self.vgg2 = vgg16(y, 'vgg16_weights.npz', self.sess2)
-        x1 = self.vgg1.conv2_2
-        y1 = self.vgg2.conv2_2
+        x1 = self.vgg1.conv3_3
+        y1 = self.vgg2.conv3_3
         return tf.reduce_mean(tf.square(x1 - y1)) + tf.reduce_mean(tf.square(x - y))

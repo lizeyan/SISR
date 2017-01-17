@@ -31,8 +31,8 @@ def gen_fsrcnn():
     return gen_model
 
 
-lr_size = (11, 11)
-factor = 3
+lr_size = (5, 5)
+factor = 6
 channel = 3
 filter_size = (5, 1, 3, 1, 9)
 filter_num = (56, 16)  # d s
@@ -41,12 +41,13 @@ hr_size = tuple(item * factor for item in lr_size)
 boarder_loss = 4 * factor
 log("low resolution size: " + str(lr_size))
 log("high resolution size: " + str(hr_size))
-train_data, train_label = load_data(["./data/Train/Set91", "./data/Train/G100"],
+train_data, train_label = load_data(["./data/Train/Set91"],
                                     lr_size[0], lr_size[1], factor=factor, size=5000000,
                                     channel=channel, boarder_loss=boarder_loss)
 log("train data shape" + str(np.shape(train_data)))
 log("train label shape" + str(np.shape(train_label)))
-test_data, test_label = load_data(["./data/Test/Set5"], lr_size[0], lr_size[1], factor=factor, size=500000,
+# test_data, test_label = load_data(["./data/Test/Set14"], lr_size[0], lr_size[1], factor=factor, size=500000,
+test_data, test_label = load_data(["./data/Test/Forward/"], factor=factor, size=500000,
                                   channel=channel,
                                   resize=False, boarder_loss=boarder_loss)
 log("The real size of train data set is: %d" % len(train_data))
@@ -58,11 +59,11 @@ keep_prob_placeholder = tf.placeholder(tf.float32, name="keep_prob")
 
 model = gen_fsrcnn()
 loss = MSELoss('MSELoss')
-optimizer = tf.train.AdamOptimizer(0.0002)
+optimizer = tf.train.AdamOptimizer(0.001)
 # optimizer = tf.train.GradientDescentOptimizer(0.0000001)
 model.compile(input_placeholder, label_placeholder, keep_prob_placeholder, loss, optimizer)
 solve_net(model, train_data, train_label, test_data, test_label,
           batch_size=128, max_epoch=100000000, disp_freq=100, test_freq=1000,
-          save_path="./model_fsrcnn/factor3_51319_3/", load_path="./model_fsrcnn/factor3_51319_3/",
+          save_path="./model_fsrcnn/factor6_51319_3/", load_path="./model_fsrcnn/factor8_51319_3/",
           # save_path="./model_fsrcnn/factor2_test/", load_path=None,
           save_res_freq=None, test_only=False)
